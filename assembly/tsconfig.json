@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "alwaysStrict": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noEmitOnError": true,
+    "strictNullChecks": true,
+    "experimentalDecorators": true,
+    "target": "esnext",
+    "module": "commonjs",
+    "noLib": true,
+    "allowJs": false
+  },
+  "include": [
+    "./**/*.ts",
+    "./assembly.types.ts" // Add the path to assembly.types.ts here
+  ]
+}
