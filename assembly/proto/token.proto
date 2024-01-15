@@ -4,6 +4,13 @@ package token;
 
 import "koinos/options.proto";
 
+// Object types
+message empty_message {}
+
+message boolean {
+   bool value = 1;
+}
+
 message str {
    string value = 1;
 }
@@ -20,54 +27,39 @@ message info {
    string name = 1;
    string symbol = 2;
    uint32 decimals = 3;
+   uint64 fee = 4 [jstype = JS_STRING];
 }
 
-message info_params {
-   string name = 1;
-   string symbol = 2;
+message current_supply {
+   uint64 rSupply = 1 [jstype = JS_STRING];
+   uint64 tSupply = 2 [jstype = JS_STRING];
 }
 
-message balance_of_args {
-   bytes owner = 1 [(koinos.btype) = ADDRESS];
+message address {
+   bytes value = 1 [(koinos.btype) = ADDRESS];
 }
 
-message transfer_args {
-   bytes from = 1 [(koinos.btype) = ADDRESS];
-   bytes to = 2 [(koinos.btype) = ADDRESS];
-   uint64 value = 3 [jstype = JS_STRING];
+message address_array {
+   repeated bytes addresses = 1 [(koinos.btype) = ADDRESS];
 }
 
-message mint_args {
-   bytes to = 1 [(koinos.btype) = ADDRESS];
-   uint64 value = 2 [jstype = JS_STRING];
+message reflection_and_token_values {
+   uint64 rAmount = 1 [jstype = JS_STRING];
+   uint64 rTransferAmount = 2 [jstype = JS_STRING];
+   uint64 rFee = 3 [jstype = JS_STRING];
+   uint64 tTransferAmount = 4 [jstype = JS_STRING];
+   uint64 tFee = 5 [jstype = JS_STRING];
 }
 
-message burn_args {
-   bytes from = 1 [(koinos.btype) = ADDRESS];
-   uint64 value = 2 [jstype = JS_STRING];
+message reflection_values {
+   uint64 rAmount = 1 [jstype = JS_STRING];
+   uint64 rTransferAmount = 2 [jstype = JS_STRING];
+   uint64 rFee = 3 [jstype = JS_STRING];
 }
 
-message approve_args {
-   bytes owner = 1 [(koinos.btype) = ADDRESS];
-   bytes spender = 2 [(koinos.btype) = ADDRESS];
-   uint64 value = 3 [jstype = JS_STRING];
-}
-
-message allowance_args {
-   bytes owner = 1 [(koinos.btype) = ADDRESS];
-   bytes spender = 2 [(koinos.btype) = ADDRESS];
-}
-
-enum direction {
-   ascending = 0;
-   descending = 1;
-}
-
-message get_allowances_args {
-   bytes owner = 1 [(koinos.btype) = ADDRESS];
-   bytes start = 2 [(koinos.btype) = ADDRESS];
-   int32 limit = 3;
-   direction direction = 4;
+message token_values {
+   uint64 tTransferAmount = 1 [jstype = JS_STRING];
+   uint64 tFee = 2 [jstype = JS_STRING];
 }
 
 message spender_value {
@@ -75,10 +67,175 @@ message spender_value {
    uint64 value = 2 [jstype = JS_STRING];
 }
 
-message get_allowances_return {
+enum direction {
+   ascending = 0;
+   descending = 1;
+}
+
+
+// Init
+
+// @description Set the token info (name, symbol, decimals) - used at deployment
+// @read-only false
+// @result empty_message
+message set_info_arguments {
+   string name = 1;
+   string symbol = 2;
+   uint64 fee = 3 [jstype = JS_STRING];
+}
+
+// @description Mint the intial total supply of tokens - used at deployment
+// @read-only false
+// @result empty_message
+message mint_arguments {
+   bytes to = 1 [(koinos.btype) = ADDRESS];
+   uint64 value = 2 [jstype = JS_STRING];
+}
+
+// Getters
+
+// @description Get the token info (name, symbol, decimals)
+// @read-only true
+// @result info
+message get_info_arguments {}
+
+// @description Get the name of the token
+// @read-only true
+// @result str
+message name_arguments {}
+
+// @description Get the symbol of the token
+// @read-only true
+// @result str
+message symbol_arguments {}
+
+// @description Get the decimals of the token
+// @read-only true
+// @result uint32
+message decimals_arguments {}
+
+// @description Get the initial total supply of tokens
+// @read-only true
+// @result uint64
+message initial_total_supply_arguments {}
+
+// @description Get the current total supply of tokens
+// @read-only true
+// @result uint64
+message total_supply_arguments {}
+
+// @description Get the token balance of an account
+// @read-only true
+// @result uint64
+message balance_of_arguments {
+   bytes owner = 1 [(koinos.btype) = ADDRESS];
+}
+
+// @description Get allowance of an account to transfer tokens
+// @read-only true
+// @result uint64
+message allowance_arguments {
+   bytes owner = 1 [(koinos.btype) = ADDRESS];
+   bytes spender = 2 [(koinos.btype) = ADDRESS];
+}
+
+// @description Get allowances list of an account to transfer tokens
+// @read-only true
+message get_allowances_arguments {
+   bytes owner = 1 [(koinos.btype) = ADDRESS];
+   bytes start = 2 [(koinos.btype) = ADDRESS];
+   int32 limit = 3;
+   direction direction = 4;
+}
+
+message get_allowances_result {
    bytes owner = 1 [(koinos.btype) = ADDRESS];
    repeated spender_value allowances = 2;
 }
+
+// @description Get the burn addresses list
+// @read-only true
+// @result address_array
+message get_burn_addresses_arguments {}
+
+// @description Get the fee collection state of an account - included or excluded from fees collection
+// @read-only true
+// @result boolean
+message get_excluded_fee_collection_state_arguments {
+   bytes address = 1 [(koinos.btype) = ADDRESS];
+}
+
+// @description Get the reward collection state of an account - included or excluded from rewards collection
+// @read-only true
+// @result boolean
+message get_excluded_reward_collection_state_arguments {
+   bytes address = 1 [(koinos.btype) = ADDRESS];
+}
+
+// @description Get the owner of the contract
+// @read-only true
+// @result address
+message get_owner_arguments {}
+
+// Setters
+
+// @description Transfer tokens from one account to another
+// @read-only false
+// @result empty_message
+message transfer_arguments {
+   bytes from = 1 [(koinos.btype) = ADDRESS];
+   bytes to = 2 [(koinos.btype) = ADDRESS];
+   uint64 value = 3 [jstype = JS_STRING];
+}
+
+// @description Approve an account to transfer tokens
+// @read-only false
+// @result empty_message
+message approve_arguments {
+   bytes owner = 1 [(koinos.btype) = ADDRESS];
+   bytes spender = 2 [(koinos.btype) = ADDRESS];
+   uint64 value = 3 [jstype = JS_STRING];
+}
+
+// @description Burn tokens from an account by sending them to the burn address
+// @read-only false
+// @result empty_message
+message burn_arguments {
+   bytes from = 1 [(koinos.btype) = ADDRESS];
+   uint64 value = 2 [jstype = JS_STRING];
+}
+
+// @description Add a burn address
+// @read-only false
+// @result empty_message
+message add_burn_account_arguments {
+   bytes address = 1 [(koinos.btype) = ADDRESS];
+}
+
+// @description Set the fee collection state of an account - included or excluded from fees collection
+// @read-only false
+// @result empty_message
+message set_excluded_fee_collection_state_arguments {
+   bytes address = 1 [(koinos.btype) = ADDRESS];
+   bool exclude = 2;
+}
+
+// @description Set the reward collection state of an account - included or excluded from rewards collection
+// @read-only false
+// @result empty_message
+message set_excluded_reward_collection_state_arguments {
+   bytes address = 1 [(koinos.btype) = ADDRESS];
+   bool exclude = 2;
+}
+
+// @description Set the new owner of the contract
+// @read-only false
+// @result empty_message
+message set_owner_arguments {
+   bytes owner = 1 [(koinos.btype) = ADDRESS];
+}
+
+// Events
 
 message transfer_event {
    bytes from = 1 [(koinos.btype) = ADDRESS];
@@ -93,7 +250,8 @@ message mint_event {
 
 message burn_event {
    bytes from = 1 [(koinos.btype) = ADDRESS];
-   uint64 value = 2 [jstype = JS_STRING];
+   bytes to = 2 [(koinos.btype) = ADDRESS];
+   uint64 value = 3 [jstype = JS_STRING];
 }
 
 message approve_event {

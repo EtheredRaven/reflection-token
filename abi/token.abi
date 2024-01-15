@@ -1,4 +1,159 @@
 {
-    "methods": {},
-    "types": ""
+    "methods": {
+        "set_info": {
+            "argument": "token.set_info_arguments",
+            "return": "token.empty_message",
+            "description": "Set the token info (name, symbol, decimals) - used at deployment",
+            "entry-point": "0x0e99cb79",
+            "read-only": false
+        },
+        "mint": {
+            "argument": "token.mint_arguments",
+            "return": "token.empty_message",
+            "description": "Mint the intial total supply of tokens - used at deployment",
+            "entry-point": "0xdc6f17bb",
+            "read-only": false
+        },
+        "get_info": {
+            "argument": "token.get_info_arguments",
+            "return": "token.info",
+            "description": "Get the token info (name, symbol, decimals)",
+            "entry-point": "0xbd7f6850",
+            "read-only": true
+        },
+        "name": {
+            "argument": "token.name_arguments",
+            "return": "token.str",
+            "description": "Get the name of the token",
+            "entry-point": "0x82a3537f",
+            "read-only": true
+        },
+        "symbol": {
+            "argument": "token.symbol_arguments",
+            "return": "token.str",
+            "description": "Get the symbol of the token",
+            "entry-point": "0xb76a7ca1",
+            "read-only": true
+        },
+        "decimals": {
+            "argument": "token.decimals_arguments",
+            "return": "token.uint32",
+            "description": "Get the decimals of the token",
+            "entry-point": "0xee80fd2f",
+            "read-only": true
+        },
+        "initial_total_supply": {
+            "argument": "token.initial_total_supply_arguments",
+            "return": "token.uint64",
+            "description": "Get the initial total supply of tokens",
+            "entry-point": "0xbb2f2fc9",
+            "read-only": true
+        },
+        "total_supply": {
+            "argument": "token.total_supply_arguments",
+            "return": "token.uint64",
+            "description": "Get the current total supply of tokens",
+            "entry-point": "0xb0da3934",
+            "read-only": true
+        },
+        "balance_of": {
+            "argument": "token.balance_of_arguments",
+            "return": "token.uint64",
+            "description": "Get the token balance of an account",
+            "entry-point": "0x5c721497",
+            "read-only": true
+        },
+        "allowance": {
+            "argument": "token.allowance_arguments",
+            "return": "token.uint64",
+            "description": "Get allowance of an account to transfer tokens",
+            "entry-point": "0x32f09fa1",
+            "read-only": true
+        },
+        "get_allowances": {
+            "argument": "token.get_allowances_arguments",
+            "return": "token.get_allowances_result",
+            "description": "Get allowances list of an account to transfer tokens",
+            "entry-point": "0x8fa16456",
+            "read-only": true
+        },
+        "get_burn_addresses": {
+            "argument": "token.get_burn_addresses_arguments",
+            "return": "token.address_array",
+            "description": "Get the burn addresses list",
+            "entry-point": "0xde4f4af4",
+            "read-only": true
+        },
+        "get_excluded_fee_collection_state": {
+            "argument": "token.get_excluded_fee_collection_state_arguments",
+            "return": "token.boolean",
+            "description": "Get the fee collection state of an account - included or excluded from fees collection",
+            "entry-point": "0xec433977",
+            "read-only": true
+        },
+        "get_excluded_reward_collection_state": {
+            "argument": "token.get_excluded_reward_collection_state_arguments",
+            "return": "token.boolean",
+            "description": "Get the reward collection state of an account - included or excluded from rewards collection",
+            "entry-point": "0xfb2555a1",
+            "read-only": true
+        },
+        "get_owner": {
+            "argument": "token.get_owner_arguments",
+            "return": "token.address",
+            "description": "Get the owner of the contract",
+            "entry-point": "0xecabdcbb",
+            "read-only": true
+        },
+        "transfer": {
+            "argument": "token.transfer_arguments",
+            "return": "token.empty_message",
+            "description": "Transfer tokens from one account to another",
+            "entry-point": "0x27f576ca",
+            "read-only": false
+        },
+        "approve": {
+            "argument": "token.approve_arguments",
+            "return": "token.empty_message",
+            "description": "Approve an account to transfer tokens",
+            "entry-point": "0x74e21680",
+            "read-only": false
+        },
+        "burn": {
+            "argument": "token.burn_arguments",
+            "return": "token.empty_message",
+            "description": "Burn tokens from an account by sending them to the burn address",
+            "entry-point": "0x859facc5",
+            "read-only": false
+        },
+        "add_burn_account": {
+            "argument": "token.add_burn_account_arguments",
+            "return": "token.empty_message",
+            "description": "Add a burn address",
+            "entry-point": "0x12c2aed7",
+            "read-only": false
+        },
+        "set_excluded_fee_collection_state": {
+            "argument": "token.set_excluded_fee_collection_state_arguments",
+            "return": "token.empty_message",
+            "description": "Set the fee collection state of an account - included or excluded from fees collection",
+            "entry-point": "0xabf15394",
+            "read-only": false
+        },
+        "set_excluded_reward_collection_state": {
+            "argument": "token.set_excluded_reward_collection_state_arguments",
+            "return": "token.empty_message",
+            "description": "Set the reward collection state of an account - included or excluded from rewards collection",
+            "entry-point": "0xaa4baf21",
+            "read-only": false
+        },
+        "set_owner": {
+            "argument": "token.set_owner_arguments",
+            "return": "token.empty_message",
+            "description": "Set the new owner of the contract",
+            "entry-point": "0x0e3c7f5b",
+            "read-only": false
+        }
+    },
+    "types": "CrEWChphc3NlbWJseS9wcm90by90b2tlbi5wcm90bxIFdG9rZW4aFGtvaW5vcy9vcHRpb25zLnByb3RvIg8KDWVtcHR5X21lc3NhZ2UiHwoHYm9vbGVhbhIUCgV2YWx1ZRgBIAEoCFIFdmFsdWUiGwoDc3RyEhQKBXZhbHVlGAEgASgJUgV2YWx1ZSIeCgZ1aW50MzISFAoFdmFsdWUYASABKA1SBXZhbHVlIiIKBnVpbnQ2NBIYCgV2YWx1ZRgBIAEoBEICMAFSBXZhbHVlImQKBGluZm8SEgoEbmFtZRgBIAEoCVIEbmFtZRIWCgZzeW1ib2wYAiABKAlSBnN5bWJvbBIaCghkZWNpbWFscxgDIAEoDVIIZGVjaW1hbHMSFAoDZmVlGAQgASgEQgIwAVIDZmVlIkwKDmN1cnJlbnRfc3VwcGx5EhwKB3JTdXBwbHkYASABKARCAjABUgdyU3VwcGx5EhwKB3RTdXBwbHkYAiABKARCAjABUgd0U3VwcGx5IiUKB2FkZHJlc3MSGgoFdmFsdWUYASABKAxCBIC1GAZSBXZhbHVlIjMKDWFkZHJlc3NfYXJyYXkSIgoJYWRkcmVzc2VzGAEgAygMQgSAtRgGUglhZGRyZXNzZXMixwEKG3JlZmxlY3Rpb25fYW5kX3Rva2VuX3ZhbHVlcxIcCgdyQW1vdW50GAEgASgEQgIwAVIHckFtb3VudBIsCg9yVHJhbnNmZXJBbW91bnQYAiABKARCAjABUg9yVHJhbnNmZXJBbW91bnQSFgoEckZlZRgDIAEoBEICMAFSBHJGZWUSLAoPdFRyYW5zZmVyQW1vdW50GAQgASgEQgIwAVIPdFRyYW5zZmVyQW1vdW50EhYKBHRGZWUYBSABKARCAjABUgR0RmVlIncKEXJlZmxlY3Rpb25fdmFsdWVzEhwKB3JBbW91bnQYASABKARCAjABUgdyQW1vdW50EiwKD3JUcmFuc2ZlckFtb3VudBgCIAEoBEICMAFSD3JUcmFuc2ZlckFtb3VudBIWCgRyRmVlGAMgASgEQgIwAVIEckZlZSJUCgx0b2tlbl92YWx1ZXMSLAoPdFRyYW5zZmVyQW1vdW50GAEgASgEQgIwAVIPdFRyYW5zZmVyQW1vdW50EhYKBHRGZWUYAiABKARCAjABUgR0RmVlIkkKDXNwZW5kZXJfdmFsdWUSHgoHc3BlbmRlchgBIAEoDEIEgLUYBlIHc3BlbmRlchIYCgV2YWx1ZRgCIAEoBEICMAFSBXZhbHVlIlYKEnNldF9pbmZvX2FyZ3VtZW50cxISCgRuYW1lGAEgASgJUgRuYW1lEhYKBnN5bWJvbBgCIAEoCVIGc3ltYm9sEhQKA2ZlZRgDIAEoBEICMAFSA2ZlZSJACg5taW50X2FyZ3VtZW50cxIUCgJ0bxgBIAEoDEIEgLUYBlICdG8SGAoFdmFsdWUYAiABKARCAjABUgV2YWx1ZSIUChJnZXRfaW5mb19hcmd1bWVudHMiEAoObmFtZV9hcmd1bWVudHMiEgoQc3ltYm9sX2FyZ3VtZW50cyIUChJkZWNpbWFsc19hcmd1bWVudHMiIAoeaW5pdGlhbF90b3RhbF9zdXBwbHlfYXJndW1lbnRzIhgKFnRvdGFsX3N1cHBseV9hcmd1bWVudHMiMgoUYmFsYW5jZV9vZl9hcmd1bWVudHMSGgoFb3duZXIYASABKAxCBIC1GAZSBW93bmVyIlEKE2FsbG93YW5jZV9hcmd1bWVudHMSGgoFb3duZXIYASABKAxCBIC1GAZSBW93bmVyEh4KB3NwZW5kZXIYAiABKAxCBIC1GAZSB3NwZW5kZXIimAEKGGdldF9hbGxvd2FuY2VzX2FyZ3VtZW50cxIaCgVvd25lchgBIAEoDEIEgLUYBlIFb3duZXISGgoFc3RhcnQYAiABKAxCBIC1GAZSBXN0YXJ0EhQKBWxpbWl0GAMgASgFUgVsaW1pdBIuCglkaXJlY3Rpb24YBCABKA4yEC50b2tlbi5kaXJlY3Rpb25SCWRpcmVjdGlvbiJpChVnZXRfYWxsb3dhbmNlc19yZXN1bHQSGgoFb3duZXIYASABKAxCBIC1GAZSBW93bmVyEjQKCmFsbG93YW5jZXMYAiADKAsyFC50b2tlbi5zcGVuZGVyX3ZhbHVlUgphbGxvd2FuY2VzIh4KHGdldF9idXJuX2FkZHJlc3Nlc19hcmd1bWVudHMiTQorZ2V0X2V4Y2x1ZGVkX2ZlZV9jb2xsZWN0aW9uX3N0YXRlX2FyZ3VtZW50cxIeCgdhZGRyZXNzGAEgASgMQgSAtRgGUgdhZGRyZXNzIlAKLmdldF9leGNsdWRlZF9yZXdhcmRfY29sbGVjdGlvbl9zdGF0ZV9hcmd1bWVudHMSHgoHYWRkcmVzcxgBIAEoDEIEgLUYBlIHYWRkcmVzcyIVChNnZXRfb3duZXJfYXJndW1lbnRzIl4KEnRyYW5zZmVyX2FyZ3VtZW50cxIYCgRmcm9tGAEgASgMQgSAtRgGUgRmcm9tEhQKAnRvGAIgASgMQgSAtRgGUgJ0bxIYCgV2YWx1ZRgDIAEoBEICMAFSBXZhbHVlImkKEWFwcHJvdmVfYXJndW1lbnRzEhoKBW93bmVyGAEgASgMQgSAtRgGUgVvd25lchIeCgdzcGVuZGVyGAIgASgMQgSAtRgGUgdzcGVuZGVyEhgKBXZhbHVlGAMgASgEQgIwAVIFdmFsdWUiRAoOYnVybl9hcmd1bWVudHMSGAoEZnJvbRgBIAEoDEIEgLUYBlIEZnJvbRIYCgV2YWx1ZRgCIAEoBEICMAFSBXZhbHVlIjwKGmFkZF9idXJuX2FjY291bnRfYXJndW1lbnRzEh4KB2FkZHJlc3MYASABKAxCBIC1GAZSB2FkZHJlc3MiZworc2V0X2V4Y2x1ZGVkX2ZlZV9jb2xsZWN0aW9uX3N0YXRlX2FyZ3VtZW50cxIeCgdhZGRyZXNzGAEgASgMQgSAtRgGUgdhZGRyZXNzEhgKB2V4Y2x1ZGUYAiABKAhSB2V4Y2x1ZGUiagouc2V0X2V4Y2x1ZGVkX3Jld2FyZF9jb2xsZWN0aW9uX3N0YXRlX2FyZ3VtZW50cxIeCgdhZGRyZXNzGAEgASgMQgSAtRgGUgdhZGRyZXNzEhgKB2V4Y2x1ZGUYAiABKAhSB2V4Y2x1ZGUiMQoTc2V0X293bmVyX2FyZ3VtZW50cxIaCgVvd25lchgBIAEoDEIEgLUYBlIFb3duZXIiWgoOdHJhbnNmZXJfZXZlbnQSGAoEZnJvbRgBIAEoDEIEgLUYBlIEZnJvbRIUCgJ0bxgCIAEoDEIEgLUYBlICdG8SGAoFdmFsdWUYAyABKARCAjABUgV2YWx1ZSI8CgptaW50X2V2ZW50EhQKAnRvGAEgASgMQgSAtRgGUgJ0bxIYCgV2YWx1ZRgCIAEoBEICMAFSBXZhbHVlIlYKCmJ1cm5fZXZlbnQSGAoEZnJvbRgBIAEoDEIEgLUYBlIEZnJvbRIUCgJ0bxgCIAEoDEIEgLUYBlICdG8SGAoFdmFsdWUYAyABKARCAjABUgV2YWx1ZSJlCg1hcHByb3ZlX2V2ZW50EhoKBW93bmVyGAEgASgMQgSAtRgGUgVvd25lchIeCgdzcGVuZGVyGAIgASgMQgSAtRgGUgdzcGVuZGVyEhgKBXZhbHVlGAMgASgEQgIwAVIFdmFsdWUqKgoJZGlyZWN0aW9uEg0KCWFzY2VuZGluZxAAEg4KCmRlc2NlbmRpbmcQAWIGcHJvdG8z"
 }

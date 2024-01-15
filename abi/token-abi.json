@@ -1,4 +1,741 @@
 {
-    "methods": {},
-    "types": ""
+    "methods": {
+        "set_info": {
+            "input": "token.set_info_arguments",
+            "output": "token.empty_message",
+            "description": "Set the token info (name, symbol, decimals) - used at deployment",
+            "entryPoint": 244960121,
+            "readOnly": false
+        },
+        "mint": {
+            "input": "token.mint_arguments",
+            "output": "token.empty_message",
+            "description": "Mint the intial total supply of tokens - used at deployment",
+            "entryPoint": 3698268091,
+            "readOnly": false
+        },
+        "get_info": {
+            "input": "token.get_info_arguments",
+            "output": "token.info",
+            "description": "Get the token info (name, symbol, decimals)",
+            "entryPoint": 3179243600,
+            "readOnly": true
+        },
+        "name": {
+            "input": "token.name_arguments",
+            "output": "token.str",
+            "description": "Get the name of the token",
+            "entryPoint": 2191741823,
+            "readOnly": true
+        },
+        "symbol": {
+            "input": "token.symbol_arguments",
+            "output": "token.str",
+            "description": "Get the symbol of the token",
+            "entryPoint": 3077209249,
+            "readOnly": true
+        },
+        "decimals": {
+            "input": "token.decimals_arguments",
+            "output": "token.uint32",
+            "description": "Get the decimals of the token",
+            "entryPoint": 4001430831,
+            "readOnly": true
+        },
+        "initial_total_supply": {
+            "input": "token.initial_total_supply_arguments",
+            "output": "token.uint64",
+            "description": "Get the initial total supply of tokens",
+            "entryPoint": 3140431817,
+            "readOnly": true
+        },
+        "total_supply": {
+            "input": "token.total_supply_arguments",
+            "output": "token.uint64",
+            "description": "Get the current total supply of tokens",
+            "entryPoint": 2967091508,
+            "readOnly": true
+        },
+        "balance_of": {
+            "input": "token.balance_of_arguments",
+            "output": "token.uint64",
+            "description": "Get the token balance of an account",
+            "entryPoint": 1550980247,
+            "readOnly": true
+        },
+        "allowance": {
+            "input": "token.allowance_arguments",
+            "output": "token.uint64",
+            "description": "Get allowance of an account to transfer tokens",
+            "entryPoint": 854630305,
+            "readOnly": true
+        },
+        "get_allowances": {
+            "input": "token.get_allowances_arguments",
+            "output": "token.get_allowances_result",
+            "description": "Get allowances list of an account to transfer tokens",
+            "entryPoint": 2409718870,
+            "readOnly": true
+        },
+        "get_burn_addresses": {
+            "input": "token.get_burn_addresses_arguments",
+            "output": "token.address_array",
+            "description": "Get the burn addresses list",
+            "entryPoint": 3729738484,
+            "readOnly": true
+        },
+        "get_excluded_fee_collection_state": {
+            "input": "token.get_excluded_fee_collection_state_arguments",
+            "output": "token.boolean",
+            "description": "Get the fee collection state of an account - included or excluded from fees collection",
+            "entryPoint": 3963828599,
+            "readOnly": true
+        },
+        "get_excluded_reward_collection_state": {
+            "input": "token.get_excluded_reward_collection_state_arguments",
+            "output": "token.boolean",
+            "description": "Get the reward collection state of an account - included or excluded from rewards collection",
+            "entryPoint": 4213527969,
+            "readOnly": true
+        },
+        "get_owner": {
+            "input": "token.get_owner_arguments",
+            "output": "token.address",
+            "description": "Get the owner of the contract",
+            "entryPoint": 3970686139,
+            "readOnly": true
+        },
+        "transfer": {
+            "input": "token.transfer_arguments",
+            "output": "token.empty_message",
+            "description": "Transfer tokens from one account to another",
+            "entryPoint": 670398154,
+            "readOnly": false
+        },
+        "approve": {
+            "input": "token.approve_arguments",
+            "output": "token.empty_message",
+            "description": "Approve an account to transfer tokens",
+            "entryPoint": 1960973952,
+            "readOnly": false
+        },
+        "burn": {
+            "input": "token.burn_arguments",
+            "output": "token.empty_message",
+            "description": "Burn tokens from an account by sending them to the burn address",
+            "entryPoint": 2241834181,
+            "readOnly": false
+        },
+        "add_burn_account": {
+            "input": "token.add_burn_account_arguments",
+            "output": "token.empty_message",
+            "description": "Add a burn address",
+            "entryPoint": 314748631,
+            "readOnly": false
+        },
+        "set_excluded_fee_collection_state": {
+            "input": "token.set_excluded_fee_collection_state_arguments",
+            "output": "token.empty_message",
+            "description": "Set the fee collection state of an account - included or excluded from fees collection",
+            "entryPoint": 2884719508,
+            "readOnly": false
+        },
+        "set_excluded_reward_collection_state": {
+            "input": "token.set_excluded_reward_collection_state_arguments",
+            "output": "token.empty_message",
+            "description": "Set the reward collection state of an account - included or excluded from rewards collection",
+            "entryPoint": 2857086753,
+            "readOnly": false
+        },
+        "set_owner": {
+            "input": "token.set_owner_arguments",
+            "output": "token.empty_message",
+            "description": "Set the new owner of the contract",
+            "entryPoint": 238845787,
+            "readOnly": false
+        }
+    },
+    "types": {
+        "nested": {
+            "token": {
+                "nested": {
+                    "empty_message": {
+                        "fields": {}
+                    },
+                    "boolean": {
+                        "fields": {
+                            "value": {
+                                "type": "bool",
+                                "id": 1
+                            }
+                        }
+                    },
+                    "str": {
+                        "fields": {
+                            "value": {
+                                "type": "string",
+                                "id": 1
+                            }
+                        }
+                    },
+                    "uint32": {
+                        "fields": {
+                            "value": {
+                                "type": "uint32",
+                                "id": 1
+                            }
+                        }
+                    },
+                    "uint64": {
+                        "fields": {
+                            "value": {
+                                "type": "uint64",
+                                "id": 1,
+                                "options": {
+                                    "jstype": "JS_STRING"
+                                }
+                            }
+                        }
+                    },
+                    "info": {
+                        "fields": {
+                            "name": {
+                                "type": "string",
+                                "id": 1
+                            },
+                            "symbol": {
+                                "type": "string",
+                                "id": 2
+                            },
+                            "decimals": {
+                                "type": "uint32",
+                                "id": 3
+                            },
+                            "fee": {
+                                "type": "uint64",
+                                "id": 4,
+                                "options": {
+                                    "jstype": "JS_STRING"
+                                }
+                            }
+                        }
+                    },
+                    "current_supply": {
+                        "fields": {
+                            "rSupply": {
+                                "type": "uint64",
+                                "id": 1,
+                                "options": {
+                                    "jstype": "JS_STRING"
+                                }
+                            },
+                            "tSupply": {
+                                "type": "uint64",
+                                "id": 2,
+                                "options": {
+                                    "jstype": "JS_STRING"
+                                }
+                            }
+                        }
+                    },
+                    "address": {
+                        "fields": {
+                            "value": {
+                                "type": "bytes",
+                                "id": 1,
+                                "options": {
+                                    "(koinos.btype)": "ADDRESS"
+                                }
+                            }
+                        }
+                    },
+                    "address_array": {
+                        "fields": {
+                            "addresses": {
+                                "rule": "repeated",
+                                "type": "bytes",
+                                "id": 1,
+                                "options": {
+                                    "(koinos.btype)": "ADDRESS"
+                                }
+                            }
+                        }
+                    },
+                    "reflection_and_token_values": {
+                        "fields": {
+                            "rAmount": {
+                                "type": "uint64",
+                                "id": 1,
+                                "options": {
+                                    "jstype": "JS_STRING"
+                                }
+                            },
+                            "rTransferAmount": {
+                                "type": "uint64",
+                                "id": 2,
+                                "options": {
+                                    "jstype": "JS_STRING"
+                                }
+                            },
+                            "rFee": {
+                                "type": "uint64",
+                                "id": 3,
+                                "options": {
+                                    "jstype": "JS_STRING"
+                                }
+                            },
+                            "tTransferAmount": {
+                                "type": "uint64",
+                                "id": 4,
+                                "options": {
+                                    "jstype": "JS_STRING"
+                                }
+                            },
+                            "tFee": {
+                                "type": "uint64",
+                                "id": 5,
+                                "options": {
+                                    "jstype": "JS_STRING"
+                                }
+                            }
+                        }
+                    },
+                    "reflection_values": {
+                        "fields": {
+                            "rAmount": {
+                                "type": "uint64",
+                                "id": 1,
+                                "options": {
+                                    "jstype": "JS_STRING"
+                                }
+                            },
+                            "rTransferAmount": {
+                                "type": "uint64",
+                                "id": 2,
+                                "options": {
+                                    "jstype": "JS_STRING"
+                                }
+                            },
+                            "rFee": {
+                                "type": "uint64",
+                                "id": 3,
+                                "options": {
+                                    "jstype": "JS_STRING"
+                                }
+                            }
+                        }
+                    },
+                    "token_values": {
+                        "fields": {
+                            "tTransferAmount": {
+                                "type": "uint64",
+                                "id": 1,
+                                "options": {
+                                    "jstype": "JS_STRING"
+                                }
+                            },
+                            "tFee": {
+                                "type": "uint64",
+                                "id": 2,
+                                "options": {
+                                    "jstype": "JS_STRING"
+                                }
+                            }
+                        }
+                    },
+                    "spender_value": {
+                        "fields": {
+                            "spender": {
+                                "type": "bytes",
+                                "id": 1,
+                                "options": {
+                                    "(koinos.btype)": "ADDRESS"
+                                }
+                            },
+                            "value": {
+                                "type": "uint64",
+                                "id": 2,
+                                "options": {
+                                    "jstype": "JS_STRING"
+                                }
+                            }
+                        }
+                    },
+                    "direction": {
+                        "values": {
+                            "ascending": 0,
+                            "descending": 1
+                        }
+                    },
+                    "set_info_arguments": {
+                        "fields": {
+                            "name": {
+                                "type": "string",
+                                "id": 1
+                            },
+                            "symbol": {
+                                "type": "string",
+                                "id": 2
+                            },
+                            "fee": {
+                                "type": "uint64",
+                                "id": 3,
+                                "options": {
+                                    "jstype": "JS_STRING"
+                                }
+                            }
+                        }
+                    },
+                    "mint_arguments": {
+                        "fields": {
+                            "to": {
+                                "type": "bytes",
+                                "id": 1,
+                                "options": {
+                                    "(koinos.btype)": "ADDRESS"
+                                }
+                            },
+                            "value": {
+                                "type": "uint64",
+                                "id": 2,
+                                "options": {
+                                    "jstype": "JS_STRING"
+                                }
+                            }
+                        }
+                    },
+                    "get_info_arguments": {
+                        "fields": {}
+                    },
+                    "name_arguments": {
+                        "fields": {}
+                    },
+                    "symbol_arguments": {
+                        "fields": {}
+                    },
+                    "decimals_arguments": {
+                        "fields": {}
+                    },
+                    "initial_total_supply_arguments": {
+                        "fields": {}
+                    },
+                    "total_supply_arguments": {
+                        "fields": {}
+                    },
+                    "balance_of_arguments": {
+                        "fields": {
+                            "owner": {
+                                "type": "bytes",
+                                "id": 1,
+                                "options": {
+                                    "(koinos.btype)": "ADDRESS"
+                                }
+                            }
+                        }
+                    },
+                    "allowance_arguments": {
+                        "fields": {
+                            "owner": {
+                                "type": "bytes",
+                                "id": 1,
+                                "options": {
+                                    "(koinos.btype)": "ADDRESS"
+                                }
+                            },
+                            "spender": {
+                                "type": "bytes",
+                                "id": 2,
+                                "options": {
+                                    "(koinos.btype)": "ADDRESS"
+                                }
+                            }
+                        }
+                    },
+                    "get_allowances_arguments": {
+                        "fields": {
+                            "owner": {
+                                "type": "bytes",
+                                "id": 1,
+                                "options": {
+                                    "(koinos.btype)": "ADDRESS"
+                                }
+                            },
+                            "start": {
+                                "type": "bytes",
+                                "id": 2,
+                                "options": {
+                                    "(koinos.btype)": "ADDRESS"
+                                }
+                            },
+                            "limit": {
+                                "type": "int32",
+                                "id": 3
+                            },
+                            "direction": {
+                                "type": "direction",
+                                "id": 4
+                            }
+                        }
+                    },
+                    "get_allowances_result": {
+                        "fields": {
+                            "owner": {
+                                "type": "bytes",
+                                "id": 1,
+                                "options": {
+                                    "(koinos.btype)": "ADDRESS"
+                                }
+                            },
+                            "allowances": {
+                                "rule": "repeated",
+                                "type": "spender_value",
+                                "id": 2
+                            }
+                        }
+                    },
+                    "get_burn_addresses_arguments": {
+                        "fields": {}
+                    },
+                    "get_excluded_fee_collection_state_arguments": {
+                        "fields": {
+                            "address": {
+                                "type": "bytes",
+                                "id": 1,
+                                "options": {
+                                    "(koinos.btype)": "ADDRESS"
+                                }
+                            }
+                        }
+                    },
+                    "get_excluded_reward_collection_state_arguments": {
+                        "fields": {
+                            "address": {
+                                "type": "bytes",
+                                "id": 1,
+                                "options": {
+                                    "(koinos.btype)": "ADDRESS"
+                                }
+                            }
+                        }
+                    },
+                    "get_owner_arguments": {
+                        "fields": {}
+                    },
+                    "transfer_arguments": {
+                        "fields": {
+                            "from": {
+                                "type": "bytes",
+                                "id": 1,
+                                "options": {
+                                    "(koinos.btype)": "ADDRESS"
+                                }
+                            },
+                            "to": {
+                                "type": "bytes",
+                                "id": 2,
+                                "options": {
+                                    "(koinos.btype)": "ADDRESS"
+                                }
+                            },
+                            "value": {
+                                "type": "uint64",
+                                "id": 3,
+                                "options": {
+                                    "jstype": "JS_STRING"
+                                }
+                            }
+                        }
+                    },
+                    "approve_arguments": {
+                        "fields": {
+                            "owner": {
+                                "type": "bytes",
+                                "id": 1,
+                                "options": {
+                                    "(koinos.btype)": "ADDRESS"
+                                }
+                            },
+                            "spender": {
+                                "type": "bytes",
+                                "id": 2,
+                                "options": {
+                                    "(koinos.btype)": "ADDRESS"
+                                }
+                            },
+                            "value": {
+                                "type": "uint64",
+                                "id": 3,
+                                "options": {
+                                    "jstype": "JS_STRING"
+                                }
+                            }
+                        }
+                    },
+                    "burn_arguments": {
+                        "fields": {
+                            "from": {
+                                "type": "bytes",
+                                "id": 1,
+                                "options": {
+                                    "(koinos.btype)": "ADDRESS"
+                                }
+                            },
+                            "value": {
+                                "type": "uint64",
+                                "id": 2,
+                                "options": {
+                                    "jstype": "JS_STRING"
+                                }
+                            }
+                        }
+                    },
+                    "add_burn_account_arguments": {
+                        "fields": {
+                            "address": {
+                                "type": "bytes",
+                                "id": 1,
+                                "options": {
+                                    "(koinos.btype)": "ADDRESS"
+                                }
+                            }
+                        }
+                    },
+                    "set_excluded_fee_collection_state_arguments": {
+                        "fields": {
+                            "address": {
+                                "type": "bytes",
+                                "id": 1,
+                                "options": {
+                                    "(koinos.btype)": "ADDRESS"
+                                }
+                            },
+                            "exclude": {
+                                "type": "bool",
+                                "id": 2
+                            }
+                        }
+                    },
+                    "set_excluded_reward_collection_state_arguments": {
+                        "fields": {
+                            "address": {
+                                "type": "bytes",
+                                "id": 1,
+                                "options": {
+                                    "(koinos.btype)": "ADDRESS"
+                                }
+                            },
+                            "exclude": {
+                                "type": "bool",
+                                "id": 2
+                            }
+                        }
+                    },
+                    "set_owner_arguments": {
+                        "fields": {
+                            "owner": {
+                                "type": "bytes",
+                                "id": 1,
+                                "options": {
+                                    "(koinos.btype)": "ADDRESS"
+                                }
+                            }
+                        }
+                    },
+                    "transfer_event": {
+                        "fields": {
+                            "from": {
+                                "type": "bytes",
+                                "id": 1,
+                                "options": {
+                                    "(koinos.btype)": "ADDRESS"
+                                }
+                            },
+                            "to": {
+                                "type": "bytes",
+                                "id": 2,
+                                "options": {
+                                    "(koinos.btype)": "ADDRESS"
+                                }
+                            },
+                            "value": {
+                                "type": "uint64",
+                                "id": 3,
+                                "options": {
+                                    "jstype": "JS_STRING"
+                                }
+                            }
+                        }
+                    },
+                    "mint_event": {
+                        "fields": {
+                            "to": {
+                                "type": "bytes",
+                                "id": 1,
+                                "options": {
+                                    "(koinos.btype)": "ADDRESS"
+                                }
+                            },
+                            "value": {
+                                "type": "uint64",
+                                "id": 2,
+                                "options": {
+                                    "jstype": "JS_STRING"
+                                }
+                            }
+                        }
+                    },
+                    "burn_event": {
+                        "fields": {
+                            "from": {
+                                "type": "bytes",
+                                "id": 1,
+                                "options": {
+                                    "(koinos.btype)": "ADDRESS"
+                                }
+                            },
+                            "to": {
+                                "type": "bytes",
+                                "id": 2,
+                                "options": {
+                                    "(koinos.btype)": "ADDRESS"
+                                }
+                            },
+                            "value": {
+                                "type": "uint64",
+                                "id": 3,
+                                "options": {
+                                    "jstype": "JS_STRING"
+                                }
+                            }
+                        }
+                    },
+                    "approve_event": {
+                        "fields": {
+                            "owner": {
+                                "type": "bytes",
+                                "id": 1,
+                                "options": {
+                                    "(koinos.btype)": "ADDRESS"
+                                }
+                            },
+                            "spender": {
+                                "type": "bytes",
+                                "id": 2,
+                                "options": {
+                                    "(koinos.btype)": "ADDRESS"
+                                }
+                            },
+                            "value": {
+                                "type": "uint64",
+                                "id": 3,
+                                "options": {
+                                    "jstype": "JS_STRING"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 }

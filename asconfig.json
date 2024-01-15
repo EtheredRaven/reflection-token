@@ -16,5 +16,9 @@
       "noAssert": false
     }
   },
-  "options": {}
+  "options": {
+    "paths": {
+      "as-bignum": ["./node_modules/as-bignum/assembly"]
+    }
+  }
 }

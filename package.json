@@ -20,5 +20,8 @@
     "build:debug": "koinos-sdk-as-cli build-all debug 0 token.proto",
     "build:release": "koinos-sdk-as-cli build-all release 0 token.proto",
     "test": "koinos-sdk-as-cli run-tests"
+  },
+  "dependencies": {
+    "as-bignum": "^0.3.0"
   }
 }
