@@ -223,11 +223,8 @@
                     "current_supply": {
                         "fields": {
                             "rSupply": {
-                                "type": "uint64",
-                                "id": 1,
-                                "options": {
-                                    "jstype": "JS_STRING"
-                                }
+                                "type": "string",
+                                "id": 1
                             },
                             "tSupply": {
                                 "type": "uint64",
@@ -264,25 +261,16 @@
                     "reflection_and_token_values": {
                         "fields": {
                             "rAmount": {
-                                "type": "uint64",
-                                "id": 1,
-                                "options": {
-                                    "jstype": "JS_STRING"
-                                }
+                                "type": "string",
+                                "id": 1
                             },
                             "rTransferAmount": {
-                                "type": "uint64",
-                                "id": 2,
-                                "options": {
-                                    "jstype": "JS_STRING"
-                                }
+                                "type": "string",
+                                "id": 2
                             },
                             "rFee": {
-                                "type": "uint64",
-                                "id": 3,
-                                "options": {
-                                    "jstype": "JS_STRING"
-                                }
+                                "type": "string",
+                                "id": 3
                             },
                             "tTransferAmount": {
                                 "type": "uint64",
@@ -303,25 +291,16 @@
                     "reflection_values": {
                         "fields": {
                             "rAmount": {
-                                "type": "uint64",
-                                "id": 1,
-                                "options": {
-                                    "jstype": "JS_STRING"
-                                }
+                                "type": "string",
+                                "id": 1
                             },
                             "rTransferAmount": {
-                                "type": "uint64",
-                                "id": 2,
-                                "options": {
-                                    "jstype": "JS_STRING"
-                                }
+                                "type": "string",
+                                "id": 2
                             },
                             "rFee": {
-                                "type": "uint64",
-                                "id": 3,
-                                "options": {
-                                    "jstype": "JS_STRING"
-                                }
+                                "type": "string",
+                                "id": 3
                             }
                         }
                     },

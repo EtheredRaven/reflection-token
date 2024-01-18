@@ -243,12 +243,12 @@ export namespace token {
     }
   }
 
-  @unmanaged
   export class current_supply {
     static encode(message: current_supply, writer: Writer): void {
-      if (message.rSupply != 0) {
-        writer.uint32(8);
-        writer.uint64(message.rSupply);
+      const unique_name_rSupply = message.rSupply;
+      if (unique_name_rSupply !== null) {
+        writer.uint32(10);
+        writer.string(unique_name_rSupply);
       }
 
       if (message.tSupply != 0) {
@@ -265,7 +265,7 @@ export namespace token {
         const tag = reader.uint32();
         switch (tag >>> 3) {
           case 1:
-            message.rSupply = reader.uint64();
+            message.rSupply = reader.string();
             break;
 
           case 2:
@@ -281,10 +281,10 @@ export namespace token {
       return message;
     }
 
-    rSupply: u64;
+    rSupply: string | null;
     tSupply: u64;
 
-    constructor(rSupply: u64 = 0, tSupply: u64 = 0) {
+    constructor(rSupply: string | null = null, tSupply: u64 = 0) {
       this.rSupply = rSupply;
       this.tSupply = tSupply;
     }
@@ -364,22 +364,24 @@ export namespace token {
     }
   }
 
-  @unmanaged
   export class reflection_and_token_values {
     static encode(message: reflection_and_token_values, writer: Writer): void {
-      if (message.rAmount != 0) {
-        writer.uint32(8);
-        writer.uint64(message.rAmount);
+      const unique_name_rAmount = message.rAmount;
+      if (unique_name_rAmount !== null) {
+        writer.uint32(10);
+        writer.string(unique_name_rAmount);
       }
 
-      if (message.rTransferAmount != 0) {
-        writer.uint32(16);
-        writer.uint64(message.rTransferAmount);
+      const unique_name_rTransferAmount = message.rTransferAmount;
+      if (unique_name_rTransferAmount !== null) {
+        writer.uint32(18);
+        writer.string(unique_name_rTransferAmount);
       }
 
-      if (message.rFee != 0) {
-        writer.uint32(24);
-        writer.uint64(message.rFee);
+      const unique_name_rFee = message.rFee;
+      if (unique_name_rFee !== null) {
+        writer.uint32(26);
+        writer.string(unique_name_rFee);
       }
 
       if (message.tTransferAmount != 0) {
@@ -401,15 +403,15 @@ export namespace token {
         const tag = reader.uint32();
         switch (tag >>> 3) {
           case 1:
-            message.rAmount = reader.uint64();
+            message.rAmount = reader.string();
             break;
 
           case 2:
-            message.rTransferAmount = reader.uint64();
+            message.rTransferAmount = reader.string();
             break;
 
           case 3:
-            message.rFee = reader.uint64();
+            message.rFee = reader.string();
             break;
 
           case 4:
@@ -429,16 +431,16 @@ export namespace token {
       return message;
     }
 
-    rAmount: u64;
-    rTransferAmount: u64;
-    rFee: u64;
+    rAmount: string | null;
+    rTransferAmount: string | null;
+    rFee: string | null;
     tTransferAmount: u64;
     tFee: u64;
 
     constructor(
-      rAmount: u64 = 0,
-      rTransferAmount: u64 = 0,
-      rFee: u64 = 0,
+      rAmount: string | null = null,
+      rTransferAmount: string | null = null,
+      rFee: string | null = null,
       tTransferAmount: u64 = 0,
       tFee: u64 = 0
     ) {
@@ -450,22 +452,24 @@ export namespace token {
     }
   }
 
-  @unmanaged
   export class reflection_values {
     static encode(message: reflection_values, writer: Writer): void {
-      if (message.rAmount != 0) {
-        writer.uint32(8);
-        writer.uint64(message.rAmount);
+      const unique_name_rAmount = message.rAmount;
+      if (unique_name_rAmount !== null) {
+        writer.uint32(10);
+        writer.string(unique_name_rAmount);
       }
 
-      if (message.rTransferAmount != 0) {
-        writer.uint32(16);
-        writer.uint64(message.rTransferAmount);
+      const unique_name_rTransferAmount = message.rTransferAmount;
+      if (unique_name_rTransferAmount !== null) {
+        writer.uint32(18);
+        writer.string(unique_name_rTransferAmount);
       }
 
-      if (message.rFee != 0) {
-        writer.uint32(24);
-        writer.uint64(message.rFee);
+      const unique_name_rFee = message.rFee;
+      if (unique_name_rFee !== null) {
+        writer.uint32(26);
+        writer.string(unique_name_rFee);
       }
     }
 
@@ -477,15 +481,15 @@ export namespace token {
         const tag = reader.uint32();
         switch (tag >>> 3) {
           case 1:
-            message.rAmount = reader.uint64();
+            message.rAmount = reader.string();
             break;
 
           case 2:
-            message.rTransferAmount = reader.uint64();
+            message.rTransferAmount = reader.string();
             break;
 
           case 3:
-            message.rFee = reader.uint64();
+            message.rFee = reader.string();
             break;
 
           default:
@@ -497,11 +501,15 @@ export namespace token {
       return message;
     }
 
-    rAmount: u64;
-    rTransferAmount: u64;
-    rFee: u64;
+    rAmount: string | null;
+    rTransferAmount: string | null;
+    rFee: string | null;
 
-    constructor(rAmount: u64 = 0, rTransferAmount: u64 = 0, rFee: u64 = 0) {
+    constructor(
+      rAmount: string | null = null,
+      rTransferAmount: string | null = null,
+      rFee: string | null = null
+    ) {
       this.rAmount = rAmount;
       this.rTransferAmount = rTransferAmount;
       this.rFee = rFee;

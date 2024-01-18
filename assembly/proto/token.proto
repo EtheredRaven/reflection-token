@@ -31,7 +31,7 @@ message info {
 }
 
 message current_supply {
-   uint64 rSupply = 1 [jstype = JS_STRING];
+   string rSupply = 1;
    uint64 tSupply = 2 [jstype = JS_STRING];
 }
 
@@ -44,17 +44,17 @@ message address_array {
 }
 
 message reflection_and_token_values {
-   uint64 rAmount = 1 [jstype = JS_STRING];
-   uint64 rTransferAmount = 2 [jstype = JS_STRING];
-   uint64 rFee = 3 [jstype = JS_STRING];
+   string rAmount = 1;
+   string rTransferAmount = 2;
+   string rFee = 3;
    uint64 tTransferAmount = 4 [jstype = JS_STRING];
    uint64 tFee = 5 [jstype = JS_STRING];
 }
 
 message reflection_values {
-   uint64 rAmount = 1 [jstype = JS_STRING];
-   uint64 rTransferAmount = 2 [jstype = JS_STRING];
-   uint64 rFee = 3 [jstype = JS_STRING];
+   string rAmount = 1;
+   string rTransferAmount = 2;
+   string rFee = 3;
 }
 
 message token_values {

@@ -5,6 +5,7 @@ import {
   chain,
   Arrays,
   System,
+  u128,
 } from "@koinos/sdk-as";
 import { Token } from "../Token";
 import { token } from "../proto/token";
@@ -16,11 +17,18 @@ const MOCK_ACCT3 = Base58.decode("1DQzuCcTKacbs9GGScRTU1cc8BsyARTPqK");
 const BLANK_ACCT = new Uint8Array(0);
 const BURN_ADDRESS = Base58.decode("1CounterpartyXXXXXXXXXXXXXXXUWLpVr");
 
-const tokenSupply = 1000000000000; // 100 000 000 with 4 decimals
+const tokenSupply: u64 = 10000000000000000; // 100 000 000 with 8 decimals
 const reflectionRate = 500; // 5%
 
 function isIntegerCloseTo(a: u64, b: u64, tolerance: u64): void {
   expect(a).toBeLessThanOrEqual(b + tolerance);
+  expect(a).toBeGreaterThanOrEqual(b - tolerance);
+}
+
+function isU128CloseTo(a: u128, b: u128, tolerance: u128): void {
+  // @ts-ignore
+  expect(a).toBeLessThanOrEqual(b + tolerance);
+  // @ts-ignore
   expect(a).toBeGreaterThanOrEqual(b - tolerance);
 }
 
@@ -52,8 +60,8 @@ describe("default token", () => {
     expect(tkn.get_info().name).toBe("Token");
     expect(tkn.symbol().value).toBe("TKN");
     expect(tkn.get_info().symbol).toBe("TKN");
-    expect(tkn.decimals().value).toBe(4);
-    expect(tkn.get_info().decimals).toBe(4);
+    expect(tkn.decimals().value).toBe(8);
+    expect(tkn.get_info().decimals).toBe(8);
     expect(tkn.get_info().fee).toBe(0);
   });
 
@@ -290,11 +298,6 @@ describe("token with fee", () => {
     expect(tkn.total_supply().value).toBe(tokenSupply);
     expect(tkn.initial_total_supply().value).toBe(tokenSupply);
 
-    expect(tkn._get_current_supply().tSupply).toBe(tokenSupply);
-    expect(tkn._get_current_supply().rSupply).toBe(
-      tokenSupply * tkn._get_rate()
-    );
-
     expect(
       tkn.get_excluded_reward_collection_state(
         new token.get_excluded_reward_collection_state_arguments(MOCK_ACCT1)
@@ -320,19 +323,46 @@ describe("token with fee", () => {
   it("should transfer tokens and get the right balance and rate", () => {
     const tkn = new Token();
     tkn.set_info(new token.set_info_arguments("Token", "TKN", reflectionRate)); // 5%
+    const u128TokenSupply: u128 = u128.fromU64(tokenSupply);
 
-    const rate = (u64.MAX_VALUE - (u64.MAX_VALUE % tokenSupply)) / tokenSupply;
+    // @ts-ignore
+    const rate: u128 = // @ts-ignore
+      (u128.Max - (u128.Max % u128TokenSupply)) / u128TokenSupply;
     tkn.mint(new token.mint_arguments(MOCK_ACCT1, tokenSupply));
+    let rTotal: u128 = u128.fromString(tkn._reflectedTotal.get()!.value!);
 
-    expect(tkn._get_rate()).toBe(rate);
+    expect(tkn._get_rate(rTotal)).toBe(rate);
 
-    const transferAmount = 10000000; // 1000 with 4 decimals
-    let values = tkn._get_values(transferAmount);
-    expect(values.tFee).toBe((transferAmount / 10000) * reflectionRate);
-    expect(values.tTransferAmount).toBe(transferAmount - values.tFee);
-    expect(values.rFee).toBe(values.tFee * rate);
-    expect(values.rAmount).toBe(transferAmount * rate);
-    expect(values.rTransferAmount).toBe(values.rAmount - values.rFee);
+    const transferAmount = 10000000000; // 1 with 8 decimals
+
+    let tokenValues = tkn._get_token_values(transferAmount);
+    let valuesTTransferAmount = tokenValues[0];
+    let valuesTFee = tokenValues[1];
+    let reflectionValues = tkn._get_reflection_values(
+      transferAmount,
+      valuesTFee,
+      rTotal
+    );
+    let valuesRAmount = reflectionValues[0];
+    let valuesRTransferAmount = reflectionValues[1];
+    let valueRFee = reflectionValues[2];
+
+    expect(valuesTFee).toBe((transferAmount / 10000) * reflectionRate);
+    expect(valuesTTransferAmount).toBe(transferAmount - valuesTFee);
+    // @ts-ignore
+    expect(valueRFee.toString()).toBe(
+      // @ts-ignore
+      (u128.fromU64(valuesTFee) * rate).toString()
+    );
+    expect(valuesRAmount.toString()).toBe(
+      // @ts-ignore
+      (u128.fromU64(transferAmount) * rate).toString()
+    );
+
+    // @ts-ignore
+    const diff: u128 = u128.fromU64(transferAmount) - u128.fromU64(valuesTFee);
+    // @ts-ignore
+    expect(valuesRTransferAmount.toString()).toBe((diff * rate).toString());
 
     // Transfer from an excluded address so no reflection should be done
     tkn.transfer(
@@ -350,13 +380,16 @@ describe("token with fee", () => {
       tkn.balance_of(new token.balance_of_arguments(MOCK_ACCT1)).value +
       tkn.balance_of(new token.balance_of_arguments(MOCK_ACCT2)).value +
       tkn.balance_of(new token.balance_of_arguments(MOCK_ACCT3)).value;
-    let reflectedTotalSupply =
-      tkn._reflectedBalances.get(MOCK_ACCT1)!.value +
-      tkn._reflectedBalances.get(MOCK_ACCT2)!.value +
-      tkn._reflectedBalances.get(MOCK_ACCT3)!.value;
+
+    let reflectedTotalSupply: u128 =
+      // @ts-ignore
+      u128.fromString(tkn._reflectedBalances.get(MOCK_ACCT1)!.value!) +
+      u128.fromString(tkn._reflectedBalances.get(MOCK_ACCT2)!.value!) +
+      u128.fromString(tkn._reflectedBalances.get(MOCK_ACCT3)!.value!);
     expect(actualTotalSupply).toBe(tokenSupply);
     expect(tkn.total_supply().value).toBe(tokenSupply);
-    expect(reflectedTotalSupply).toBe(tokenSupply * rate);
+    // @ts-ignore
+    expect(reflectedTotalSupply).toBe(u128TokenSupply * rate);
 
     // Now transfer from a non-excluded address, reflection should be done
     MockVM.setCaller(
@@ -370,30 +403,60 @@ describe("token with fee", () => {
     let initialMockAcct2Balance = tkn.balance_of(
       new token.balance_of_arguments(MOCK_ACCT2)
     ).value;
-    let initialRate = tkn._get_rate();
+    let intialRTotal: u128 = u128.fromString(tkn._reflectedTotal.get()!.value!);
+    let initialRate = tkn._get_rate(intialRTotal);
     expect(initialRate).toBe(rate);
-    let intialRTotal = tkn._reflectedTotal.get()!.value;
-    let newTransferAmount = transferAmount / 2;
-    values = tkn._get_values(newTransferAmount);
-    expect(values.tFee).toBe((newTransferAmount / 10000) * reflectionRate);
-    expect(values.rFee).toBe(values.tFee * rate);
+
+    const newTransferAmount = transferAmount / 3;
+    tokenValues = tkn._get_token_values(newTransferAmount);
+    valuesTTransferAmount = tokenValues[0];
+    valuesTFee = tokenValues[1];
+    reflectionValues = tkn._get_reflection_values(
+      newTransferAmount,
+      valuesTFee,
+      intialRTotal
+    );
+    valuesRAmount = reflectionValues[0];
+    valuesRTransferAmount = reflectionValues[1];
+    valueRFee = reflectionValues[2];
+    expect(valuesTFee).toBe((newTransferAmount * reflectionRate) / 10000);
+    // @ts-ignore
+    expect(valueRFee.toString()).toBe(
+      // @ts-ignore
+      (u128.fromU64(valuesTFee) * rate).toString()
+    );
     tkn.transfer(
       new token.transfer_arguments(MOCK_ACCT2, MOCK_ACCT3, newTransferAmount)
     );
 
-    const newRate = tkn._get_rate();
+    const newRate: u128 = tkn._get_rate(
+      u128.fromString(tkn._reflectedTotal.get()!.value!)
+    );
+    // @ts-ignore
+    const expectedMockAcct2ReflectedBalance: u128 =
+      // @ts-ignore
+      u128.fromU64(initialMockAcct2Balance - newTransferAmount) * rate;
     expect(tkn._reflectedBalances.get(MOCK_ACCT2)!.value).toBe(
-      (initialMockAcct2Balance - newTransferAmount) * rate
+      expectedMockAcct2ReflectedBalance.toString()
     );
+
+    // @ts-ignore
+    const expectedMockAcct3ReflectedBalance: u128 =
+      // @ts-ignore
+      u128.fromU64(newTransferAmount) * rate - valueRFee;
     expect(tkn._reflectedBalances.get(MOCK_ACCT3)!.value).toBe(
-      newTransferAmount * rate - values.rFee
+      expectedMockAcct3ReflectedBalance.toString()
     );
-    expect(tkn._reflectedTotal.get()!.value).toBe(intialRTotal - values.rFee);
-    isIntegerCloseTo(
-      newRate,
-      tkn._reflectedTotal.get()!.value / tokenSupply,
-      1
+    // @ts-ignore
+    let expectedReflectedTotal = intialRTotal - valueRFee;
+    expect(tkn._reflectedTotal.get()!.value).toBe(
+      expectedReflectedTotal.toString()
     );
+
+    // @ts-ignore
+    let expectedRate: u128 = // @ts-ignore
+      u128.fromString(tkn._reflectedTotal.get()!.value!) / u128TokenSupply;
+    isU128CloseTo(newRate, expectedRate, u128.fromI32(1));
 
     expect(
       tkn.get_excluded_reward_collection_state(
@@ -421,24 +484,45 @@ describe("token with fee", () => {
       tkn.balance_of(new token.balance_of_arguments(MOCK_ACCT1)).value +
       tkn.balance_of(new token.balance_of_arguments(MOCK_ACCT2)).value +
       tkn.balance_of(new token.balance_of_arguments(MOCK_ACCT3)).value;
-    reflectedTotalSupply =
-      tkn._reflectedBalances.get(MOCK_ACCT1)!.value +
-      tkn._reflectedBalances.get(MOCK_ACCT2)!.value +
-      tkn._reflectedBalances.get(MOCK_ACCT3)!.value;
-    isIntegerCloseTo(actualTotalSupply, tokenSupply, 100000);
+    isIntegerCloseTo(actualTotalSupply, tokenSupply, 10);
+    isU128CloseTo(
+      u128.fromU64(actualTotalSupply),
+      u128TokenSupply,
+      u128.fromI32(10)
+    );
+
+    // Check the balance of the accounts
+    // @ts-ignore
+    const reflectedRewardMockAcct1: u128 = // @ts-ignore
+      (u128.fromU64(valuesTFee) * u128.fromU64(initialMockAcct1Balance)) /
+      // @ts-ignore
+      u128TokenSupply;
+
     isIntegerCloseTo(
       tkn.balance_of(new token.balance_of_arguments(MOCK_ACCT1)).value,
-      initialMockAcct1Balance +
-        (values.tFee * initialMockAcct1Balance) / tokenSupply,
-      100000
+      initialMockAcct1Balance + reflectedRewardMockAcct1.toU64(),
+      10
     );
-    isIntegerCloseTo(
-      tkn.balance_of(new token.balance_of_arguments(MOCK_ACCT2)).value,
-      initialMockAcct2Balance -
-        newTransferAmount +
-        ((initialMockAcct2Balance - newTransferAmount) * values.tFee) /
-          tokenSupply,
-      100000
-    );
+
+    const newMockAcct2Balance: u64 =
+      initialMockAcct2Balance - newTransferAmount;
+    // @ts-ignore
+    const reflectedRewardMockAcct2: u128 = // @ts-ignore
+      (u128.fromU64(valuesTFee) * u128.fromU64(newMockAcct2Balance)) /
+      // @ts-ignore
+      u128TokenSupply;
+    expect(
+      tkn.balance_of(new token.balance_of_arguments(MOCK_ACCT2)).value
+    ).toBe(newMockAcct2Balance + reflectedRewardMockAcct2.toU64());
+
+    const newMockAcct3Balance: u64 = valuesTTransferAmount;
+    // @ts-ignore
+    const reflectedRewardMockAcct3: u128 = // @ts-ignore
+      (u128.fromU64(valuesTFee) * u128.fromU64(newMockAcct3Balance)) /
+      // @ts-ignore
+      u128TokenSupply;
+    expect(
+      tkn.balance_of(new token.balance_of_arguments(MOCK_ACCT3)).value
+    ).toBe(newMockAcct3Balance + reflectedRewardMockAcct3.toU64());
   });
 });

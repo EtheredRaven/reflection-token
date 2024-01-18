@@ -29,11 +29,9 @@ const defaultBurnAddresses = [
   Base58.decode("1CounterpartyXXXXXXXXXXXXXXXUWLpVr"),
   Base58.decode("1111111111111111111114oLvT2"),
 ];
-const defaultTokenDecimals = 4;
+const defaultTokenDecimals = 8;
 const feesDecimals = 100; // 2 decimals
 const defaultFee = 0; // 5% fee = 500 to account for 2 decimals
-
-// TODO: Change all the _reflectedBalances and _totalReflected from u64 to u128 as string
 
 export class Token {
   _contractId: Uint8Array;
@@ -184,7 +182,7 @@ export class Token {
     supply.value = SafeMath.add(supply.value, args.value);
     this._supply.put(supply);
 
-    // @ts-ignore can be done in AS
+    // @ts-ignore
     const total: u128 = u128.Max - (u128.Max % u128.fromU64(supply.value));
     const reflectedTotal = new token.str(total.toString()); // _reflectedTotal is thus divisible by _supply and the reflection rate is always an integer
     this._reflectedTotal.put(reflectedTotal);
@@ -318,9 +316,17 @@ export class Token {
     if (isExcludedFromRewards) {
       return this._balances.get(owner)!;
     }
-    return new token.uint64(
-      this._token_from_reflection(this._reflectedBalances.get(owner)!.value)
+
+    const currentRate: u128 = this._get_rate(
+      u128.fromString(this._reflectedTotal.get()!.value!)
     );
+    const rAmount: u128 = u128.fromString(
+      this._reflectedBalances.get(owner)!.value!
+    );
+    // @ts-ignore
+    const res: u128 = rAmount / currentRate;
+
+    return new token.uint64(res.toU64());
   }
 
   /**
@@ -617,21 +623,37 @@ export class Token {
       this._info.put(info);
     }
 
-    const transferValues = this._get_values(args.value);
+    // Get and compute all the required values for the transfer
+    const rTotal: token.str = this._reflectedTotal.get()!;
+    const rTotalValue: u128 = u128.fromString(rTotal.value!);
+    const tokenValues = this._get_token_values(args.value);
+    const tTransferAmount = tokenValues[0];
+    const tFee = tokenValues[1];
+    const reflectionValues = this._get_reflection_values(
+      args.value,
+      tFee,
+      rTotalValue
+    );
+    const rAmount = reflectionValues[0];
+    const rTransferAmount = reflectionValues[1];
+    const rFee = reflectionValues[2];
 
+    // Update the sender balances
     const isSenderExcludedFromRewards =
       this.get_excluded_reward_collection_state(
         new token.get_excluded_reward_collection_state_arguments(args.from!)
       ).value;
     let fromReflectedBalance = this._reflectedBalances.get(args.from!)!;
+    const fromReflectedBalanceValue: u128 = u128.fromString(
+      fromReflectedBalance.value!
+    );
     System.require(
-      fromReflectedBalance.value >= transferValues.rAmount,
+      fromReflectedBalanceValue >= rAmount,
       "account 'from' has insufficient balance"
     );
-    fromReflectedBalance.value = SafeMath.sub(
-      fromReflectedBalance.value,
-      transferValues.rAmount
-    );
+
+    fromReflectedBalance.value = // @ts-ignore
+      (fromReflectedBalanceValue - rAmount).toString();
     this._reflectedBalances.put(args.from!, fromReflectedBalance);
     if (isSenderExcludedFromRewards) {
       let fromBalance = this._balances.get(args.from!)!;
@@ -639,26 +661,31 @@ export class Token {
       this._balances.put(args.from!, fromBalance);
     }
 
+    // Update the receiver balances
     const isRecipientExcludedFromRewards =
       this.get_excluded_reward_collection_state(
         new token.get_excluded_reward_collection_state_arguments(args.to!)
       ).value;
     let toReflectedBalance = this._reflectedBalances.get(args.to!)!;
-    toReflectedBalance.value = SafeMath.add(
-      toReflectedBalance.value,
-      transferValues.rTransferAmount
+    const toReflectedBalanceValue: u128 = u128.fromString(
+      toReflectedBalance.value!
     );
+
+    const newToReflectedBalanceValue: u128 = // @ts-ignore
+      toReflectedBalanceValue + rTransferAmount;
+    toReflectedBalance.value = newToReflectedBalanceValue.toString();
     this._reflectedBalances.put(args.to!, toReflectedBalance);
     if (isRecipientExcludedFromRewards) {
       let toBalance = this._balances.get(args.to!)!;
-      toBalance.value = SafeMath.add(
-        toBalance.value,
-        transferValues.tTransferAmount
-      );
+      toBalance.value = SafeMath.add(toBalance.value, tTransferAmount);
       this._balances.put(args.to!, toBalance);
     }
 
-    this._reflect_fee(transferValues.rFee);
+    // Update the total reflected supply to reflect the fees to the other balances
+    // @ts-ignore
+    const newRTotal: u128 = rTotalValue - rFee; // @ts-ignore
+    rTotal.value = newRTotal.toString();
+    this._reflectedTotal.put(rTotal);
 
     // Check if is a burn
     const burnAddresses = this._burnAddresses.get()!.addresses;
@@ -700,153 +727,61 @@ export class Token {
   }
 
   /**
-   * Calculate the fee for a transfer of a specific amount
-   * @internal
-   * @param amount - amount to transfer
-   * @returns {token.uint64} - fee for the transfer
-   */
-  _calculate_fee(amount: u64): token.uint64 {
-    return new token.uint64(
-      SafeMath.div(
-        SafeMath.mul(amount, this._info.get()!.fee),
-        SafeMath.mul(100, feesDecimals)
-      )
-    );
-  }
-
-  /**
-   * Reflect the fee for a transfer of a specific amount (update the reflected total) to ajust the rate
-   * @internal
-   * @param rFee - reflection fee
-   */
-  _reflect_fee(rFee: u64): void {
-    let rTotal = this._reflectedTotal.get()!;
-    rTotal.value = SafeMath.sub(rTotal.value, rFee);
-    this._reflectedTotal.put(rTotal);
-  }
-
-  /**
-   * Get the real token amount from the reflection amount (reflection is a virtual value used to avoid rounding errors)
-   * @internal
-   * @param rAmount - reflection amount
-   * @returns {u64} - token amount
-   */
-  _token_from_reflection(rAmount: u64): u64 {
-    System.require(
-      rAmount <= this._reflectedTotal.get()!.value,
-      "amount must be less than total reflections"
-    );
-    const currentRate = this._get_rate();
-    return SafeMath.div(rAmount, currentRate);
-  }
-
-  /**
    * Get the rate to convert token amount to reflection amount
    * @internal
-   * @returns {u64} - rate
+   * @returns {u128} - rate
    */
-  _get_rate(): u64 {
-    const current_supply = this._get_current_supply();
-    const rSupply = current_supply.rSupply;
-    const tSupply = current_supply.tSupply;
-
-    if (rSupply % tSupply === 0) {
-      return SafeMath.div(rSupply, tSupply);
-    } else {
-      // Not exactly divisible, perform ceiling division
-      return SafeMath.div(rSupply, tSupply) + 1;
-    }
-  }
-
-  /**
-   * Get the current supply (total and reflected)
-   * @internal
-   * @returns {token.current_supply} - current supply
-   */
-  _get_current_supply(): token.current_supply {
-    const initialReflectedSupply = this._reflectedTotal.get()!.value;
-    const initialTotalSupply = this._supply.get()!.value;
-    const defaultReturn = new token.current_supply(
-      initialReflectedSupply,
-      initialTotalSupply
-    );
-    let rSupply: u64 = initialReflectedSupply;
-    let tSupply: u64 = initialTotalSupply;
+  _get_rate(rSupply: u128): u128 {
+    let tSupply: u64 = this._supply.get()!.value;
     const excludedFromRewardsArray =
       this._excludedFromRewardsArray.get()!.addresses;
 
     for (let i: i32 = 0; i < excludedFromRewardsArray.length; i++) {
-      const reflectedBalance = this._reflectedBalances.get(
-        excludedFromRewardsArray[i]
-      )!.value;
+      const reflectedBalance: u128 = u128.fromString(
+        this._reflectedBalances.get(excludedFromRewardsArray[i])!.value!
+      );
       const balance = this._balances.get(excludedFromRewardsArray[i])!.value;
-      if (reflectedBalance > rSupply || balance > tSupply) {
-        // Overflow case
-        return defaultReturn;
-      }
 
-      rSupply = SafeMath.sub(rSupply, reflectedBalance);
+      // @ts-ignore
+      rSupply = rSupply - reflectedBalance;
       tSupply = SafeMath.sub(tSupply, balance);
     }
 
-    if (rSupply < SafeMath.div(initialReflectedSupply, initialTotalSupply)) {
-      return defaultReturn;
-    }
-
-    return new token.current_supply(rSupply, tSupply);
-  }
-
-  /**
-   * Get the token values for a transfer of a specific amount
-   * @internal
-   * @param tAmount - amount to transfer
-   * @returns {token.token_values} - token values for the transfer, including the fee and the transfer amount
-   */
-  _get_token_values(tAmount: u64): token.token_values {
-    const fee = this._calculate_fee(tAmount);
-    const tTransferAmount = SafeMath.sub(tAmount, fee.value);
-    return new token.token_values(tTransferAmount, fee.value);
-  }
-
-  /**
-   * Get the reflection values for a transfer of a specific amount
-   * @internal
-   * @param tAmount - amount to transfer
-   * @param tFee - fee for the transfer
-   * @param currentRate - current rate
-   * @returns {token.reflection_values} - reflection values for the transfer, including the fee, the transfer amount and the reflection amount
-   */
-  _get_reflection_values(
-    tAmount: u64,
-    tFee: u64,
-    currentRate: u64
-  ): token.reflection_values {
-    const rAmount = SafeMath.mul(tAmount, currentRate);
-    const rFee = SafeMath.mul(tFee, currentRate);
-    const rTransferAmount = SafeMath.sub(rAmount, rFee);
-    return new token.reflection_values(rAmount, rTransferAmount, rFee);
+    // @ts-ignore
+    return rSupply / u128.fromU64(tSupply);
   }
 
   /**
    * Get the values for a transfer of a specific amount
    * @internal
    * @param tAmount - amount to transfer
-   * @returns {token.reflection_and_token_values}
+   * @returns {u128[]} - [rAmount, rTransferAmount, rFee, tTransferAmount]
    */
-  _get_values(tAmount: u64): token.reflection_and_token_values {
-    const values = this._get_token_values(tAmount);
-    const reflectionValues = this._get_reflection_values(
-      tAmount,
-      values.tFee,
-      this._get_rate()
+  _get_reflection_values(tAmount: u64, tFee: u64, rSupply: u128): u128[] {
+    const currentRate = this._get_rate(rSupply);
+
+    // @ts-ignore
+    const rAmount: u128 = u128.fromU64(tAmount) * currentRate;
+    // @ts-ignore
+    const rFee: u128 = u128.fromU64(tFee) * currentRate;
+    // @ts-ignore
+    const rTransferAmount: u128 = rAmount - rFee;
+    return [rAmount, rTransferAmount, rFee];
+  }
+
+  /**
+   * Get the values for a transfer of a specific amount
+   * @internal
+   * @param tAmount - amount to transfer
+   * @returns {u64[]} - [tTransferAmount, tFee]
+   */
+  _get_token_values(tAmount: u64): u64[] {
+    const tFee = SafeMath.div(
+      SafeMath.mul(tAmount, this._info.get()!.fee),
+      SafeMath.mul(100, feesDecimals)
     );
-    return new token.reflection_and_token_values(
-      reflectionValues.rAmount,
-      reflectionValues.rTransferAmount,
-      reflectionValues.rFee,
-      values.tTransferAmount,
-      values.tFee
-    );
+    const tTransferAmount = SafeMath.sub(tAmount, tFee);
+    return [tTransferAmount, tFee];
   }
 
   /**
