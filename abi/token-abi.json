@@ -1,17 +1,10 @@
 {
     "methods": {
-        "set_info": {
-            "input": "token.set_info_arguments",
+        "init_token": {
+            "input": "token.init_token_arguments",
             "output": "token.empty_message",
             "description": "Set the token info (name, symbol, decimals) - used at deployment",
-            "entryPoint": 244960121,
-            "readOnly": false
-        },
-        "mint": {
-            "input": "token.mint_arguments",
-            "output": "token.empty_message",
-            "description": "Mint the intial total supply of tokens - used at deployment",
-            "entryPoint": 3698268091,
+            "entryPoint": 3587679940,
             "readOnly": false
         },
         "get_info": {
@@ -63,6 +56,13 @@
             "entryPoint": 1550980247,
             "readOnly": true
         },
+        "balance_of_t": {
+            "input": "token.balance_of_t_arguments",
+            "output": "token.uint64",
+            "description": "Get the token balance of an account (not reflected)",
+            "entryPoint": 209068576,
+            "readOnly": true
+        },
         "allowance": {
             "input": "token.allowance_arguments",
             "output": "token.uint64",
@@ -96,6 +96,13 @@
             "output": "token.boolean",
             "description": "Get the reward collection state of an account - included or excluded from rewards collection",
             "entryPoint": 4213527969,
+            "readOnly": true
+        },
+        "get_excluded_from_rewards_array": {
+            "input": "token.get_excluded_from_rewards_array_arguments",
+            "output": "token.address_array",
+            "description": "Get the array of accounts excluded from rewards collection",
+            "entryPoint": 1243413097,
             "readOnly": true
         },
         "get_owner": {
@@ -133,18 +140,18 @@
             "entryPoint": 314748631,
             "readOnly": false
         },
-        "set_excluded_fee_collection_state": {
-            "input": "token.set_excluded_fee_collection_state_arguments",
+        "exclude_fee_collection_state": {
+            "input": "token.exclude_fee_collection_state_arguments",
             "output": "token.empty_message",
-            "description": "Set the fee collection state of an account - included or excluded from fees collection",
-            "entryPoint": 2884719508,
+            "description": "Exclude an account from fees collection",
+            "entryPoint": 2817948874,
             "readOnly": false
         },
-        "set_excluded_reward_collection_state": {
-            "input": "token.set_excluded_reward_collection_state_arguments",
+        "exclude_reward_collection_state": {
+            "input": "token.exclude_reward_collection_state_arguments",
             "output": "token.empty_message",
-            "description": "Set the reward collection state of an account - included or excluded from rewards collection",
-            "entryPoint": 2857086753,
+            "description": "Exclude an account from rewards collection",
+            "entryPoint": 1112381614,
             "readOnly": false
         },
         "set_owner": {
@@ -346,7 +353,7 @@
                             "descending": 1
                         }
                     },
-                    "set_info_arguments": {
+                    "init_token_arguments": {
                         "fields": {
                             "name": {
                                 "type": "string",
@@ -362,21 +369,17 @@
                                 "options": {
                                     "jstype": "JS_STRING"
                                 }
-                            }
-                        }
-                    },
-                    "mint_arguments": {
-                        "fields": {
-                            "to": {
+                            },
+                            "mintTo": {
                                 "type": "bytes",
-                                "id": 1,
+                                "id": 4,
                                 "options": {
                                     "(koinos.btype)": "ADDRESS"
                                 }
                             },
-                            "value": {
+                            "mintValue": {
                                 "type": "uint64",
-                                "id": 2,
+                                "id": 5,
                                 "options": {
                                     "jstype": "JS_STRING"
                                 }
@@ -402,6 +405,17 @@
                         "fields": {}
                     },
                     "balance_of_arguments": {
+                        "fields": {
+                            "owner": {
+                                "type": "bytes",
+                                "id": 1,
+                                "options": {
+                                    "(koinos.btype)": "ADDRESS"
+                                }
+                            }
+                        }
+                    },
+                    "balance_of_t_arguments": {
                         "fields": {
                             "owner": {
                                 "type": "bytes",
@@ -497,6 +511,9 @@
                             }
                         }
                     },
+                    "get_excluded_from_rewards_array_arguments": {
+                        "fields": {}
+                    },
                     "get_owner_arguments": {
                         "fields": {}
                     },
@@ -579,7 +596,7 @@
                             }
                         }
                     },
-                    "set_excluded_fee_collection_state_arguments": {
+                    "exclude_fee_collection_state_arguments": {
                         "fields": {
                             "address": {
                                 "type": "bytes",
@@ -587,14 +604,10 @@
                                 "options": {
                                     "(koinos.btype)": "ADDRESS"
                                 }
-                            },
-                            "exclude": {
-                                "type": "bool",
-                                "id": 2
                             }
                         }
                     },
-                    "set_excluded_reward_collection_state_arguments": {
+                    "exclude_reward_collection_state_arguments": {
                         "fields": {
                             "address": {
                                 "type": "bytes",
@@ -602,10 +615,6 @@
                                 "options": {
                                     "(koinos.btype)": "ADDRESS"
                                 }
-                            },
-                            "exclude": {
-                                "type": "bool",
-                                "id": 2
                             }
                         }
                     },

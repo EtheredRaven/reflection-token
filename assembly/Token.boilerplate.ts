@@ -2,21 +2,12 @@ import { System, Protobuf, authority } from "@koinos/sdk-as";
 import { token } from "./proto/token";
 
 export class Token {
-  set_info(args: token.set_info_arguments): token.empty_message {
+  init_token(args: token.init_token_arguments): token.empty_message {
     // const name = args.name;
     // const symbol = args.symbol;
     // const fee = args.fee;
-
-    // YOUR CODE HERE
-
-    const res = new token.empty_message();
-
-    return res;
-  }
-
-  mint(args: token.mint_arguments): token.empty_message {
-    // const to = args.to;
-    // const value = args.value;
+    // const mint_to = args.mint_to;
+    // const mint_value = args.mint_value;
 
     // YOUR CODE HERE
 
@@ -95,6 +86,17 @@ export class Token {
     return res;
   }
 
+  balance_of_t(args: token.balance_of_t_arguments): token.uint64 {
+    // const owner = args.owner;
+
+    // YOUR CODE HERE
+
+    const res = new token.uint64();
+    // res.value = ;
+
+    return res;
+  }
+
   allowance(args: token.allowance_arguments): token.uint64 {
     // const owner = args.owner;
     // const spender = args.spender;
@@ -161,6 +163,17 @@ export class Token {
     return res;
   }
 
+  get_excluded_from_rewards_array(
+    args: token.get_excluded_from_rewards_array_arguments
+  ): token.address_array {
+    // YOUR CODE HERE
+
+    const res = new token.address_array();
+    // res.addresses = ;
+
+    return res;
+  }
+
   get_owner(args: token.get_owner_arguments): token.address {
     // YOUR CODE HERE
 
@@ -217,11 +230,10 @@ export class Token {
     return res;
   }
 
-  set_excluded_fee_collection_state(
-    args: token.set_excluded_fee_collection_state_arguments
+  exclude_fee_collection_state(
+    args: token.exclude_fee_collection_state_arguments
   ): token.empty_message {
     // const address = args.address;
-    // const exclude = args.exclude;
 
     // YOUR CODE HERE
 
@@ -230,11 +242,10 @@ export class Token {
     return res;
   }
 
-  set_excluded_reward_collection_state(
-    args: token.set_excluded_reward_collection_state_arguments
+  exclude_reward_collection_state(
+    args: token.exclude_reward_collection_state_arguments
   ): token.empty_message {
     // const address = args.address;
-    // const exclude = args.exclude;
 
     // YOUR CODE HERE
 

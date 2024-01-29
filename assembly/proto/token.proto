@@ -78,18 +78,12 @@ enum direction {
 // @description Set the token info (name, symbol, decimals) - used at deployment
 // @read-only false
 // @result empty_message
-message set_info_arguments {
+message init_token_arguments {
    string name = 1;
    string symbol = 2;
    uint64 fee = 3 [jstype = JS_STRING];
-}
-
-// @description Mint the intial total supply of tokens - used at deployment
-// @read-only false
-// @result empty_message
-message mint_arguments {
-   bytes to = 1 [(koinos.btype) = ADDRESS];
-   uint64 value = 2 [jstype = JS_STRING];
+   bytes mint_to = 4 [(koinos.btype) = ADDRESS];
+   uint64 mint_value = 5 [jstype = JS_STRING];
 }
 
 // Getters
@@ -128,6 +122,13 @@ message total_supply_arguments {}
 // @read-only true
 // @result uint64
 message balance_of_arguments {
+   bytes owner = 1 [(koinos.btype) = ADDRESS];
+}
+
+// @description Get the token balance of an account (not reflected)
+// @read-only true
+// @result uint64
+message balance_of_t_arguments {
    bytes owner = 1 [(koinos.btype) = ADDRESS];
 }
 
@@ -172,6 +173,11 @@ message get_excluded_reward_collection_state_arguments {
    bytes address = 1 [(koinos.btype) = ADDRESS];
 }
 
+// @description Get the array of accounts excluded from rewards collection
+// @read-only true
+// @result address_array
+message get_excluded_from_rewards_array_arguments {}
+
 // @description Get the owner of the contract
 // @read-only true
 // @result address
@@ -212,20 +218,18 @@ message add_burn_account_arguments {
    bytes address = 1 [(koinos.btype) = ADDRESS];
 }
 
-// @description Set the fee collection state of an account - included or excluded from fees collection
+// @description Exclude an account from fees collection
 // @read-only false
 // @result empty_message
-message set_excluded_fee_collection_state_arguments {
+message exclude_fee_collection_state_arguments {
    bytes address = 1 [(koinos.btype) = ADDRESS];
-   bool exclude = 2;
 }
 
-// @description Set the reward collection state of an account - included or excluded from rewards collection
+// @description Exclude an account from rewards collection
 // @read-only false
 // @result empty_message
-message set_excluded_reward_collection_state_arguments {
+message exclude_reward_collection_state_arguments {
    bytes address = 1 [(koinos.btype) = ADDRESS];
-   bool exclude = 2;
 }
 
 // @description Set the new owner of the contract

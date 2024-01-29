@@ -610,8 +610,8 @@ export namespace token {
     }
   }
 
-  export class set_info_arguments {
-    static encode(message: set_info_arguments, writer: Writer): void {
+  export class init_token_arguments {
+    static encode(message: init_token_arguments, writer: Writer): void {
       const unique_name_name = message.name;
       if (unique_name_name !== null) {
         writer.uint32(10);
@@ -628,11 +628,22 @@ export namespace token {
         writer.uint32(24);
         writer.uint64(message.fee);
       }
+
+      const unique_name_mint_to = message.mint_to;
+      if (unique_name_mint_to !== null) {
+        writer.uint32(34);
+        writer.bytes(unique_name_mint_to);
+      }
+
+      if (message.mint_value != 0) {
+        writer.uint32(40);
+        writer.uint64(message.mint_value);
+      }
     }
 
-    static decode(reader: Reader, length: i32): set_info_arguments {
+    static decode(reader: Reader, length: i32): init_token_arguments {
       const end: usize = length < 0 ? reader.end : reader.ptr + length;
-      const message = new set_info_arguments();
+      const message = new init_token_arguments();
 
       while (reader.ptr < end) {
         const tag = reader.uint32();
@@ -649,6 +660,14 @@ export namespace token {
             message.fee = reader.uint64();
             break;
 
+          case 4:
+            message.mint_to = reader.bytes();
+            break;
+
+          case 5:
+            message.mint_value = reader.uint64();
+            break;
+
           default:
             reader.skipType(tag & 7);
             break;
@@ -661,62 +680,21 @@ export namespace token {
     name: string | null;
     symbol: string | null;
     fee: u64;
+    mint_to: Uint8Array | null;
+    mint_value: u64;
 
     constructor(
       name: string | null = null,
       symbol: string | null = null,
-      fee: u64 = 0
+      fee: u64 = 0,
+      mint_to: Uint8Array | null = null,
+      mint_value: u64 = 0
     ) {
       this.name = name;
       this.symbol = symbol;
       this.fee = fee;
-    }
-  }
-
-  export class mint_arguments {
-    static encode(message: mint_arguments, writer: Writer): void {
-      const unique_name_to = message.to;
-      if (unique_name_to !== null) {
-        writer.uint32(10);
-        writer.bytes(unique_name_to);
-      }
-
-      if (message.value != 0) {
-        writer.uint32(16);
-        writer.uint64(message.value);
-      }
-    }
-
-    static decode(reader: Reader, length: i32): mint_arguments {
-      const end: usize = length < 0 ? reader.end : reader.ptr + length;
-      const message = new mint_arguments();
-
-      while (reader.ptr < end) {
-        const tag = reader.uint32();
-        switch (tag >>> 3) {
-          case 1:
-            message.to = reader.bytes();
-            break;
-
-          case 2:
-            message.value = reader.uint64();
-            break;
-
-          default:
-            reader.skipType(tag & 7);
-            break;
-        }
-      }
-
-      return message;
-    }
-
-    to: Uint8Array | null;
-    value: u64;
-
-    constructor(to: Uint8Array | null = null, value: u64 = 0) {
-      this.to = to;
-      this.value = value;
+      this.mint_to = mint_to;
+      this.mint_value = mint_value;
     }
   }
 
@@ -873,6 +851,42 @@ export namespace token {
     static decode(reader: Reader, length: i32): balance_of_arguments {
       const end: usize = length < 0 ? reader.end : reader.ptr + length;
       const message = new balance_of_arguments();
+
+      while (reader.ptr < end) {
+        const tag = reader.uint32();
+        switch (tag >>> 3) {
+          case 1:
+            message.owner = reader.bytes();
+            break;
+
+          default:
+            reader.skipType(tag & 7);
+            break;
+        }
+      }
+
+      return message;
+    }
+
+    owner: Uint8Array | null;
+
+    constructor(owner: Uint8Array | null = null) {
+      this.owner = owner;
+    }
+  }
+
+  export class balance_of_t_arguments {
+    static encode(message: balance_of_t_arguments, writer: Writer): void {
+      const unique_name_owner = message.owner;
+      if (unique_name_owner !== null) {
+        writer.uint32(10);
+        writer.bytes(unique_name_owner);
+      }
+    }
+
+    static decode(reader: Reader, length: i32): balance_of_t_arguments {
+      const end: usize = length < 0 ? reader.end : reader.ptr + length;
+      const message = new balance_of_t_arguments();
 
       while (reader.ptr < end) {
         const tag = reader.uint32();
@@ -1189,6 +1203,35 @@ export namespace token {
   }
 
   @unmanaged
+  export class get_excluded_from_rewards_array_arguments {
+    static encode(
+      message: get_excluded_from_rewards_array_arguments,
+      writer: Writer
+    ): void {}
+
+    static decode(
+      reader: Reader,
+      length: i32
+    ): get_excluded_from_rewards_array_arguments {
+      const end: usize = length < 0 ? reader.end : reader.ptr + length;
+      const message = new get_excluded_from_rewards_array_arguments();
+
+      while (reader.ptr < end) {
+        const tag = reader.uint32();
+        switch (tag >>> 3) {
+          default:
+            reader.skipType(tag & 7);
+            break;
+        }
+      }
+
+      return message;
+    }
+
+    constructor() {}
+  }
+
+  @unmanaged
   export class get_owner_arguments {
     static encode(message: get_owner_arguments, writer: Writer): void {}
 
@@ -1420,9 +1463,9 @@ export namespace token {
     }
   }
 
-  export class set_excluded_fee_collection_state_arguments {
+  export class exclude_fee_collection_state_arguments {
     static encode(
-      message: set_excluded_fee_collection_state_arguments,
+      message: exclude_fee_collection_state_arguments,
       writer: Writer
     ): void {
       const unique_name_address = message.address;
@@ -1430,29 +1473,20 @@ export namespace token {
         writer.uint32(10);
         writer.bytes(unique_name_address);
       }
-
-      if (message.exclude != false) {
-        writer.uint32(16);
-        writer.bool(message.exclude);
-      }
     }
 
     static decode(
       reader: Reader,
       length: i32
-    ): set_excluded_fee_collection_state_arguments {
+    ): exclude_fee_collection_state_arguments {
       const end: usize = length < 0 ? reader.end : reader.ptr + length;
-      const message = new set_excluded_fee_collection_state_arguments();
+      const message = new exclude_fee_collection_state_arguments();
 
       while (reader.ptr < end) {
         const tag = reader.uint32();
         switch (tag >>> 3) {
           case 1:
             message.address = reader.bytes();
-            break;
-
-          case 2:
-            message.exclude = reader.bool();
             break;
 
           default:
@@ -1465,17 +1499,15 @@ export namespace token {
     }
 
     address: Uint8Array | null;
-    exclude: bool;
 
-    constructor(address: Uint8Array | null = null, exclude: bool = false) {
+    constructor(address: Uint8Array | null = null) {
       this.address = address;
-      this.exclude = exclude;
     }
   }
 
-  export class set_excluded_reward_collection_state_arguments {
+  export class exclude_reward_collection_state_arguments {
     static encode(
-      message: set_excluded_reward_collection_state_arguments,
+      message: exclude_reward_collection_state_arguments,
       writer: Writer
     ): void {
       const unique_name_address = message.address;
@@ -1483,29 +1515,20 @@ export namespace token {
         writer.uint32(10);
         writer.bytes(unique_name_address);
       }
-
-      if (message.exclude != false) {
-        writer.uint32(16);
-        writer.bool(message.exclude);
-      }
     }
 
     static decode(
       reader: Reader,
       length: i32
-    ): set_excluded_reward_collection_state_arguments {
+    ): exclude_reward_collection_state_arguments {
       const end: usize = length < 0 ? reader.end : reader.ptr + length;
-      const message = new set_excluded_reward_collection_state_arguments();
+      const message = new exclude_reward_collection_state_arguments();
 
       while (reader.ptr < end) {
         const tag = reader.uint32();
         switch (tag >>> 3) {
           case 1:
             message.address = reader.bytes();
-            break;
-
-          case 2:
-            message.exclude = reader.bool();
             break;
 
           default:
@@ -1518,11 +1541,9 @@ export namespace token {
     }
 
     address: Uint8Array | null;
-    exclude: bool;
 
-    constructor(address: Uint8Array | null = null, exclude: bool = false) {
+    constructor(address: Uint8Array | null = null) {
       this.address = address;
-      this.exclude = exclude;
     }
   }
 

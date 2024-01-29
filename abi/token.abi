@@ -1,17 +1,10 @@
 {
     "methods": {
-        "set_info": {
-            "argument": "token.set_info_arguments",
+        "init_token": {
+            "argument": "token.init_token_arguments",
             "return": "token.empty_message",
             "description": "Set the token info (name, symbol, decimals) - used at deployment",
-            "entry-point": "0x0e99cb79",
-            "read-only": false
-        },
-        "mint": {
-            "argument": "token.mint_arguments",
-            "return": "token.empty_message",
-            "description": "Mint the intial total supply of tokens - used at deployment",
-            "entry-point": "0xdc6f17bb",
+            "entry-point": "0xd5d7a6c4",
             "read-only": false
         },
         "get_info": {
@@ -63,6 +56,13 @@
             "entry-point": "0x5c721497",
             "read-only": true
         },
+        "balance_of_t": {
+            "argument": "token.balance_of_t_arguments",
+            "return": "token.uint64",
+            "description": "Get the token balance of an account (not reflected)",
+            "entry-point": "0x0c762220",
+            "read-only": true
+        },
         "allowance": {
             "argument": "token.allowance_arguments",
             "return": "token.uint64",
@@ -96,6 +96,13 @@
             "return": "token.boolean",
             "description": "Get the reward collection state of an account - included or excluded from rewards collection",
             "entry-point": "0xfb2555a1",
+            "read-only": true
+        },
+        "get_excluded_from_rewards_array": {
+            "argument": "token.get_excluded_from_rewards_array_arguments",
+            "return": "token.address_array",
+            "description": "Get the array of accounts excluded from rewards collection",
+            "entry-point": "0x4a1cfa69",
             "read-only": true
         },
         "get_owner": {
@@ -133,18 +140,18 @@
             "entry-point": "0x12c2aed7",
             "read-only": false
         },
-        "set_excluded_fee_collection_state": {
-            "argument": "token.set_excluded_fee_collection_state_arguments",
+        "exclude_fee_collection_state": {
+            "argument": "token.exclude_fee_collection_state_arguments",
             "return": "token.empty_message",
-            "description": "Set the fee collection state of an account - included or excluded from fees collection",
-            "entry-point": "0xabf15394",
+            "description": "Exclude an account from fees collection",
+            "entry-point": "0xa7f67cca",
             "read-only": false
         },
-        "set_excluded_reward_collection_state": {
-            "argument": "token.set_excluded_reward_collection_state_arguments",
+        "exclude_reward_collection_state": {
+            "argument": "token.exclude_reward_collection_state_arguments",
             "return": "token.empty_message",
-            "description": "Set the reward collection state of an account - included or excluded from rewards collection",
-            "entry-point": "0xaa4baf21",
+            "description": "Exclude an account from rewards collection",
+            "entry-point": "0x424d98ae",
             "read-only": false
         },
         "set_owner": {
@@ -155,5 +162,5 @@
             "read-only": false
         }
     },
-    "types": "CpUWChphc3NlbWJseS9wcm90by90b2tlbi5wcm90bxIFdG9rZW4aFGtvaW5vcy9vcHRpb25zLnByb3RvIg8KDWVtcHR5X21lc3NhZ2UiHwoHYm9vbGVhbhIUCgV2YWx1ZRgBIAEoCFIFdmFsdWUiGwoDc3RyEhQKBXZhbHVlGAEgASgJUgV2YWx1ZSIeCgZ1aW50MzISFAoFdmFsdWUYASABKA1SBXZhbHVlIiIKBnVpbnQ2NBIYCgV2YWx1ZRgBIAEoBEICMAFSBXZhbHVlImQKBGluZm8SEgoEbmFtZRgBIAEoCVIEbmFtZRIWCgZzeW1ib2wYAiABKAlSBnN5bWJvbBIaCghkZWNpbWFscxgDIAEoDVIIZGVjaW1hbHMSFAoDZmVlGAQgASgEQgIwAVIDZmVlIkgKDmN1cnJlbnRfc3VwcGx5EhgKB3JTdXBwbHkYASABKAlSB3JTdXBwbHkSHAoHdFN1cHBseRgCIAEoBEICMAFSB3RTdXBwbHkiJQoHYWRkcmVzcxIaCgV2YWx1ZRgBIAEoDEIEgLUYBlIFdmFsdWUiMwoNYWRkcmVzc19hcnJheRIiCglhZGRyZXNzZXMYASADKAxCBIC1GAZSCWFkZHJlc3NlcyK7AQobcmVmbGVjdGlvbl9hbmRfdG9rZW5fdmFsdWVzEhgKB3JBbW91bnQYASABKAlSB3JBbW91bnQSKAoPclRyYW5zZmVyQW1vdW50GAIgASgJUg9yVHJhbnNmZXJBbW91bnQSEgoEckZlZRgDIAEoCVIEckZlZRIsCg90VHJhbnNmZXJBbW91bnQYBCABKARCAjABUg90VHJhbnNmZXJBbW91bnQSFgoEdEZlZRgFIAEoBEICMAFSBHRGZWUiawoRcmVmbGVjdGlvbl92YWx1ZXMSGAoHckFtb3VudBgBIAEoCVIHckFtb3VudBIoCg9yVHJhbnNmZXJBbW91bnQYAiABKAlSD3JUcmFuc2ZlckFtb3VudBISCgRyRmVlGAMgASgJUgRyRmVlIlQKDHRva2VuX3ZhbHVlcxIsCg90VHJhbnNmZXJBbW91bnQYASABKARCAjABUg90VHJhbnNmZXJBbW91bnQSFgoEdEZlZRgCIAEoBEICMAFSBHRGZWUiSQoNc3BlbmRlcl92YWx1ZRIeCgdzcGVuZGVyGAEgASgMQgSAtRgGUgdzcGVuZGVyEhgKBXZhbHVlGAIgASgEQgIwAVIFdmFsdWUiVgoSc2V0X2luZm9fYXJndW1lbnRzEhIKBG5hbWUYASABKAlSBG5hbWUSFgoGc3ltYm9sGAIgASgJUgZzeW1ib2wSFAoDZmVlGAMgASgEQgIwAVIDZmVlIkAKDm1pbnRfYXJndW1lbnRzEhQKAnRvGAEgASgMQgSAtRgGUgJ0bxIYCgV2YWx1ZRgCIAEoBEICMAFSBXZhbHVlIhQKEmdldF9pbmZvX2FyZ3VtZW50cyIQCg5uYW1lX2FyZ3VtZW50cyISChBzeW1ib2xfYXJndW1lbnRzIhQKEmRlY2ltYWxzX2FyZ3VtZW50cyIgCh5pbml0aWFsX3RvdGFsX3N1cHBseV9hcmd1bWVudHMiGAoWdG90YWxfc3VwcGx5X2FyZ3VtZW50cyIyChRiYWxhbmNlX29mX2FyZ3VtZW50cxIaCgVvd25lchgBIAEoDEIEgLUYBlIFb3duZXIiUQoTYWxsb3dhbmNlX2FyZ3VtZW50cxIaCgVvd25lchgBIAEoDEIEgLUYBlIFb3duZXISHgoHc3BlbmRlchgCIAEoDEIEgLUYBlIHc3BlbmRlciKYAQoYZ2V0X2FsbG93YW5jZXNfYXJndW1lbnRzEhoKBW93bmVyGAEgASgMQgSAtRgGUgVvd25lchIaCgVzdGFydBgCIAEoDEIEgLUYBlIFc3RhcnQSFAoFbGltaXQYAyABKAVSBWxpbWl0Ei4KCWRpcmVjdGlvbhgEIAEoDjIQLnRva2VuLmRpcmVjdGlvblIJZGlyZWN0aW9uImkKFWdldF9hbGxvd2FuY2VzX3Jlc3VsdBIaCgVvd25lchgBIAEoDEIEgLUYBlIFb3duZXISNAoKYWxsb3dhbmNlcxgCIAMoCzIULnRva2VuLnNwZW5kZXJfdmFsdWVSCmFsbG93YW5jZXMiHgocZ2V0X2J1cm5fYWRkcmVzc2VzX2FyZ3VtZW50cyJNCitnZXRfZXhjbHVkZWRfZmVlX2NvbGxlY3Rpb25fc3RhdGVfYXJndW1lbnRzEh4KB2FkZHJlc3MYASABKAxCBIC1GAZSB2FkZHJlc3MiUAouZ2V0X2V4Y2x1ZGVkX3Jld2FyZF9jb2xsZWN0aW9uX3N0YXRlX2FyZ3VtZW50cxIeCgdhZGRyZXNzGAEgASgMQgSAtRgGUgdhZGRyZXNzIhUKE2dldF9vd25lcl9hcmd1bWVudHMiXgoSdHJhbnNmZXJfYXJndW1lbnRzEhgKBGZyb20YASABKAxCBIC1GAZSBGZyb20SFAoCdG8YAiABKAxCBIC1GAZSAnRvEhgKBXZhbHVlGAMgASgEQgIwAVIFdmFsdWUiaQoRYXBwcm92ZV9hcmd1bWVudHMSGgoFb3duZXIYASABKAxCBIC1GAZSBW93bmVyEh4KB3NwZW5kZXIYAiABKAxCBIC1GAZSB3NwZW5kZXISGAoFdmFsdWUYAyABKARCAjABUgV2YWx1ZSJECg5idXJuX2FyZ3VtZW50cxIYCgRmcm9tGAEgASgMQgSAtRgGUgRmcm9tEhgKBXZhbHVlGAIgASgEQgIwAVIFdmFsdWUiPAoaYWRkX2J1cm5fYWNjb3VudF9hcmd1bWVudHMSHgoHYWRkcmVzcxgBIAEoDEIEgLUYBlIHYWRkcmVzcyJnCitzZXRfZXhjbHVkZWRfZmVlX2NvbGxlY3Rpb25fc3RhdGVfYXJndW1lbnRzEh4KB2FkZHJlc3MYASABKAxCBIC1GAZSB2FkZHJlc3MSGAoHZXhjbHVkZRgCIAEoCFIHZXhjbHVkZSJqCi5zZXRfZXhjbHVkZWRfcmV3YXJkX2NvbGxlY3Rpb25fc3RhdGVfYXJndW1lbnRzEh4KB2FkZHJlc3MYASABKAxCBIC1GAZSB2FkZHJlc3MSGAoHZXhjbHVkZRgCIAEoCFIHZXhjbHVkZSIxChNzZXRfb3duZXJfYXJndW1lbnRzEhoKBW93bmVyGAEgASgMQgSAtRgGUgVvd25lciJaCg50cmFuc2Zlcl9ldmVudBIYCgRmcm9tGAEgASgMQgSAtRgGUgRmcm9tEhQKAnRvGAIgASgMQgSAtRgGUgJ0bxIYCgV2YWx1ZRgDIAEoBEICMAFSBXZhbHVlIjwKCm1pbnRfZXZlbnQSFAoCdG8YASABKAxCBIC1GAZSAnRvEhgKBXZhbHVlGAIgASgEQgIwAVIFdmFsdWUiVgoKYnVybl9ldmVudBIYCgRmcm9tGAEgASgMQgSAtRgGUgRmcm9tEhQKAnRvGAIgASgMQgSAtRgGUgJ0bxIYCgV2YWx1ZRgDIAEoBEICMAFSBXZhbHVlImUKDWFwcHJvdmVfZXZlbnQSGgoFb3duZXIYASABKAxCBIC1GAZSBW93bmVyEh4KB3NwZW5kZXIYAiABKAxCBIC1GAZSB3NwZW5kZXISGAoFdmFsdWUYAyABKARCAjABUgV2YWx1ZSoqCglkaXJlY3Rpb24SDQoJYXNjZW5kaW5nEAASDgoKZGVzY2VuZGluZxABYgZwcm90bzM="
+    "types": "Cr0WChphc3NlbWJseS9wcm90by90b2tlbi5wcm90bxIFdG9rZW4aFGtvaW5vcy9vcHRpb25zLnByb3RvIg8KDWVtcHR5X21lc3NhZ2UiHwoHYm9vbGVhbhIUCgV2YWx1ZRgBIAEoCFIFdmFsdWUiGwoDc3RyEhQKBXZhbHVlGAEgASgJUgV2YWx1ZSIeCgZ1aW50MzISFAoFdmFsdWUYASABKA1SBXZhbHVlIiIKBnVpbnQ2NBIYCgV2YWx1ZRgBIAEoBEICMAFSBXZhbHVlImQKBGluZm8SEgoEbmFtZRgBIAEoCVIEbmFtZRIWCgZzeW1ib2wYAiABKAlSBnN5bWJvbBIaCghkZWNpbWFscxgDIAEoDVIIZGVjaW1hbHMSFAoDZmVlGAQgASgEQgIwAVIDZmVlIkgKDmN1cnJlbnRfc3VwcGx5EhgKB3JTdXBwbHkYASABKAlSB3JTdXBwbHkSHAoHdFN1cHBseRgCIAEoBEICMAFSB3RTdXBwbHkiJQoHYWRkcmVzcxIaCgV2YWx1ZRgBIAEoDEIEgLUYBlIFdmFsdWUiMwoNYWRkcmVzc19hcnJheRIiCglhZGRyZXNzZXMYASADKAxCBIC1GAZSCWFkZHJlc3NlcyK7AQobcmVmbGVjdGlvbl9hbmRfdG9rZW5fdmFsdWVzEhgKB3JBbW91bnQYASABKAlSB3JBbW91bnQSKAoPclRyYW5zZmVyQW1vdW50GAIgASgJUg9yVHJhbnNmZXJBbW91bnQSEgoEckZlZRgDIAEoCVIEckZlZRIsCg90VHJhbnNmZXJBbW91bnQYBCABKARCAjABUg90VHJhbnNmZXJBbW91bnQSFgoEdEZlZRgFIAEoBEICMAFSBHRGZWUiawoRcmVmbGVjdGlvbl92YWx1ZXMSGAoHckFtb3VudBgBIAEoCVIHckFtb3VudBIoCg9yVHJhbnNmZXJBbW91bnQYAiABKAlSD3JUcmFuc2ZlckFtb3VudBISCgRyRmVlGAMgASgJUgRyRmVlIlQKDHRva2VuX3ZhbHVlcxIsCg90VHJhbnNmZXJBbW91bnQYASABKARCAjABUg90VHJhbnNmZXJBbW91bnQSFgoEdEZlZRgCIAEoBEICMAFSBHRGZWUiSQoNc3BlbmRlcl92YWx1ZRIeCgdzcGVuZGVyGAEgASgMQgSAtRgGUgdzcGVuZGVyEhgKBXZhbHVlGAIgASgEQgIwAVIFdmFsdWUimgEKFGluaXRfdG9rZW5fYXJndW1lbnRzEhIKBG5hbWUYASABKAlSBG5hbWUSFgoGc3ltYm9sGAIgASgJUgZzeW1ib2wSFAoDZmVlGAMgASgEQgIwAVIDZmVlEh0KB21pbnRfdG8YBCABKAxCBIC1GAZSBm1pbnRUbxIhCgptaW50X3ZhbHVlGAUgASgEQgIwAVIJbWludFZhbHVlIhQKEmdldF9pbmZvX2FyZ3VtZW50cyIQCg5uYW1lX2FyZ3VtZW50cyISChBzeW1ib2xfYXJndW1lbnRzIhQKEmRlY2ltYWxzX2FyZ3VtZW50cyIgCh5pbml0aWFsX3RvdGFsX3N1cHBseV9hcmd1bWVudHMiGAoWdG90YWxfc3VwcGx5X2FyZ3VtZW50cyIyChRiYWxhbmNlX29mX2FyZ3VtZW50cxIaCgVvd25lchgBIAEoDEIEgLUYBlIFb3duZXIiNAoWYmFsYW5jZV9vZl90X2FyZ3VtZW50cxIaCgVvd25lchgBIAEoDEIEgLUYBlIFb3duZXIiUQoTYWxsb3dhbmNlX2FyZ3VtZW50cxIaCgVvd25lchgBIAEoDEIEgLUYBlIFb3duZXISHgoHc3BlbmRlchgCIAEoDEIEgLUYBlIHc3BlbmRlciKYAQoYZ2V0X2FsbG93YW5jZXNfYXJndW1lbnRzEhoKBW93bmVyGAEgASgMQgSAtRgGUgVvd25lchIaCgVzdGFydBgCIAEoDEIEgLUYBlIFc3RhcnQSFAoFbGltaXQYAyABKAVSBWxpbWl0Ei4KCWRpcmVjdGlvbhgEIAEoDjIQLnRva2VuLmRpcmVjdGlvblIJZGlyZWN0aW9uImkKFWdldF9hbGxvd2FuY2VzX3Jlc3VsdBIaCgVvd25lchgBIAEoDEIEgLUYBlIFb3duZXISNAoKYWxsb3dhbmNlcxgCIAMoCzIULnRva2VuLnNwZW5kZXJfdmFsdWVSCmFsbG93YW5jZXMiHgocZ2V0X2J1cm5fYWRkcmVzc2VzX2FyZ3VtZW50cyJNCitnZXRfZXhjbHVkZWRfZmVlX2NvbGxlY3Rpb25fc3RhdGVfYXJndW1lbnRzEh4KB2FkZHJlc3MYASABKAxCBIC1GAZSB2FkZHJlc3MiUAouZ2V0X2V4Y2x1ZGVkX3Jld2FyZF9jb2xsZWN0aW9uX3N0YXRlX2FyZ3VtZW50cxIeCgdhZGRyZXNzGAEgASgMQgSAtRgGUgdhZGRyZXNzIisKKWdldF9leGNsdWRlZF9mcm9tX3Jld2FyZHNfYXJyYXlfYXJndW1lbnRzIhUKE2dldF9vd25lcl9hcmd1bWVudHMiXgoSdHJhbnNmZXJfYXJndW1lbnRzEhgKBGZyb20YASABKAxCBIC1GAZSBGZyb20SFAoCdG8YAiABKAxCBIC1GAZSAnRvEhgKBXZhbHVlGAMgASgEQgIwAVIFdmFsdWUiaQoRYXBwcm92ZV9hcmd1bWVudHMSGgoFb3duZXIYASABKAxCBIC1GAZSBW93bmVyEh4KB3NwZW5kZXIYAiABKAxCBIC1GAZSB3NwZW5kZXISGAoFdmFsdWUYAyABKARCAjABUgV2YWx1ZSJECg5idXJuX2FyZ3VtZW50cxIYCgRmcm9tGAEgASgMQgSAtRgGUgRmcm9tEhgKBXZhbHVlGAIgASgEQgIwAVIFdmFsdWUiPAoaYWRkX2J1cm5fYWNjb3VudF9hcmd1bWVudHMSHgoHYWRkcmVzcxgBIAEoDEIEgLUYBlIHYWRkcmVzcyJICiZleGNsdWRlX2ZlZV9jb2xsZWN0aW9uX3N0YXRlX2FyZ3VtZW50cxIeCgdhZGRyZXNzGAEgASgMQgSAtRgGUgdhZGRyZXNzIksKKWV4Y2x1ZGVfcmV3YXJkX2NvbGxlY3Rpb25fc3RhdGVfYXJndW1lbnRzEh4KB2FkZHJlc3MYASABKAxCBIC1GAZSB2FkZHJlc3MiMQoTc2V0X293bmVyX2FyZ3VtZW50cxIaCgVvd25lchgBIAEoDEIEgLUYBlIFb3duZXIiWgoOdHJhbnNmZXJfZXZlbnQSGAoEZnJvbRgBIAEoDEIEgLUYBlIEZnJvbRIUCgJ0bxgCIAEoDEIEgLUYBlICdG8SGAoFdmFsdWUYAyABKARCAjABUgV2YWx1ZSI8CgptaW50X2V2ZW50EhQKAnRvGAEgASgMQgSAtRgGUgJ0bxIYCgV2YWx1ZRgCIAEoBEICMAFSBXZhbHVlIlYKCmJ1cm5fZXZlbnQSGAoEZnJvbRgBIAEoDEIEgLUYBlIEZnJvbRIUCgJ0bxgCIAEoDEIEgLUYBlICdG8SGAoFdmFsdWUYAyABKARCAjABUgV2YWx1ZSJlCg1hcHByb3ZlX2V2ZW50EhoKBW93bmVyGAEgASgMQgSAtRgGUgVvd25lchIeCgdzcGVuZGVyGAIgASgMQgSAtRgGUgdzcGVuZGVyEhgKBXZhbHVlGAMgASgEQgIwAVIFdmFsdWUqKgoJZGlyZWN0aW9uEg0KCWFzY2VuZGluZxAAEg4KCmRlc2NlbmRpbmcQAWIGcHJvdG8z"
 }

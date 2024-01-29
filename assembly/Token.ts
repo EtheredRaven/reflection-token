@@ -10,25 +10,24 @@ import {
 import { token } from "./proto/token";
 import { System2 } from "./System2";
 
-const MAX = u64.MAX_VALUE;
+const OWNER_SPACE_ID = 10;
+const SUPPLY_ID = 11;
+const BALANCES_SPACE_ID = 12;
+const INFO_SPACE_ID = 13;
+const ALLOWANCES_SPACE_ID = 14;
+const BURN_ADDRESSES_SPACE_ID = 15;
 
-const OWNER_SPACE_ID = 0;
-const SUPPLY_ID = 1;
-const BALANCES_SPACE_ID = 2;
-const INFO_SPACE_ID = 3;
-const ALLOWANCES_SPACE_ID = 4;
-const BURN_ADDRESSES_SPACE_ID = 5;
-
-const REFLECTED_BALANCES_ID = 5;
-const REFLECTED_TOTAL_SUPPLY_ID = 6;
-const EXCLUDED_FROM_FEES_ID = 7;
-const EXCLUDED_FROM_REWARDS_ID = 8;
-const EXCLUDED_FROM_REWARDS_ARRAY_ID = 9;
+const REFLECTED_BALANCES_ID = 16;
+const REFLECTED_TOTAL_SUPPLY_ID = 17;
+const EXCLUDED_FROM_FEES_ID = 18;
+const EXCLUDED_FROM_REWARDS_ID = 19;
+const EXCLUDED_FROM_REWARDS_ARRAY_ID = 20;
 
 const defaultBurnAddresses = [
   Base58.decode("1CounterpartyXXXXXXXXXXXXXXXUWLpVr"),
   Base58.decode("1111111111111111111114oLvT2"),
 ];
+const emptyAddresses: Uint8Array[] = [];
 const defaultTokenDecimals = 8;
 const feesDecimals = 100; // 2 decimals
 const defaultFee = 0; // 5% fee = 500 to account for 2 decimals
@@ -126,21 +125,22 @@ export class Token {
       EXCLUDED_FROM_REWARDS_ARRAY_ID,
       token.address_array.decode,
       token.address_array.encode,
-      () => new token.address_array([])
+      () => new token.address_array(emptyAddresses)
     );
   }
 
   // INITIALIZATION -----------------------------------------------------------
 
   /**
-   * Set the token info (name, symbol, decimals) - used at deployment
+   * Init the token (name, symbol, decimals, mint) - used at deployment
    * @external
    * @param args
    * @param args.name - name of the token
    * @param args.symbol - symbol of the token
    * @param args.decimals - decimals of the token
+   *
    */
-  set_info(args: token.set_info_arguments): token.empty_message {
+  init_token(args: token.init_token_arguments): token.empty_message {
     System.require(!this._info.get(), "the info is already defined");
     System.require(args.name, "name is not defined");
     System.require(args.symbol, "symbol is not defined");
@@ -153,60 +153,43 @@ export class Token {
     this._info.put(info_arguments);
 
     // The new owner is the first one that calls this function
-    this._owner.put(new token.address(System.getCaller().caller));
+    if (System.getCaller().caller && System.getCaller().caller!.length > 0) {
+      this._owner.put(new token.address(System.getCaller().caller));
+    }
 
-    return new token.empty_message();
-  }
+    // Mint the initial supply
 
-  /**
-   * Mint the intial total supply of tokens - used at deployment
-   * @external
-   * @param args.to - account to receive the tokens
-   * @param args.value - amount of tokens to mint (total supply)
-   */
-  mint(args: token.mint_arguments): token.empty_message {
-    this._check_ownership();
-    const supply = this._supply.get()!;
-    System.require(
-      supply.value <= MAX - args.value,
-      "mint would overflow supply"
+    const mint_to = args.mint_to!;
+    this._balances.put(
+      mint_to,
+      new token.uint64(SafeMath.add(0, args.mint_value))
     );
-    System.require(
-      supply.value == u64.MIN_VALUE,
-      "the token supply is already minted"
-    );
-
-    let toBalance = this._balances.get(args.to!)!;
-    toBalance.value = SafeMath.add(toBalance.value, args.value);
-    this._balances.put(args.to!, toBalance);
-    supply.value = SafeMath.add(supply.value, args.value);
-    this._supply.put(supply);
+    this._supply.put(new token.uint64(SafeMath.add(0, args.mint_value)));
 
     // @ts-ignore
-    const total: u128 = u128.Max - (u128.Max % u128.fromU64(supply.value));
-    const reflectedTotal = new token.str(total.toString()); // _reflectedTotal is thus divisible by _supply and the reflection rate is always an integer
-    this._reflectedTotal.put(reflectedTotal);
-    this._reflectedBalances.put(args.to!, reflectedTotal);
+    const total: u128 = u128.Max - (u128.Max % u128.fromU64(args.mint_value));
+    this._reflectedTotal.put(new token.str(total.toString()));
+    this._reflectedBalances.put(mint_to, new token.str(total.toString()));
 
-    this.set_excluded_fee_collection_state(
-      new token.set_excluded_fee_collection_state_arguments(args.to!, true)
+    this.exclude_fee_collection_state(
+      new token.exclude_fee_collection_state_arguments(mint_to)
     );
 
     // Don't set fees for burn addresses
     const burnAdresses = this._burnAddresses.get()!.addresses;
     for (let i = 0; i < burnAdresses.length; i++) {
-      this.set_excluded_fee_collection_state(
-        new token.set_excluded_fee_collection_state_arguments(
-          burnAdresses[i],
-          true
-        )
+      this.exclude_fee_collection_state(
+        new token.exclude_fee_collection_state_arguments(burnAdresses[i])
       );
     }
 
-    const impacted = [args.to!];
+    const impacted = [mint_to];
     System.event(
       "token.mint_event",
-      Protobuf.encode<token.mint_arguments>(args, token.mint_arguments.encode),
+      Protobuf.encode<token.mint_event>(
+        new token.mint_event(mint_to, args.mint_value),
+        token.mint_event.encode
+      ),
       impacted
     );
 
@@ -320,13 +303,27 @@ export class Token {
     const currentRate: u128 = this._get_rate(
       u128.fromString(this._reflectedTotal.get()!.value!)
     );
+
     const rAmount: u128 = u128.fromString(
       this._reflectedBalances.get(owner)!.value!
     );
+
     // @ts-ignore
     const res: u128 = rAmount / currentRate;
 
     return new token.uint64(res.toU64());
+  }
+
+  /**
+   * Get the token balance of an account without reflections
+   * @external
+   * @readonly
+   * @param args
+   * @param args.owner - account to get the balance
+   * @returns {token.uint64} - balance of the account
+   */
+  balance_of_t(args: token.balance_of_t_arguments): token.uint64 {
+    return this._balances.get(args.owner!)!;
   }
 
   /**
@@ -423,7 +420,22 @@ export class Token {
   }
 
   /**
+   * Get the excluded from rewards array
+   * @external
+   * @readonly
+   * @returns {token.address_array} - excluded from rewards array
+   */
+  get_excluded_from_rewards_array(
+    args: token.get_excluded_from_rewards_array_arguments
+  ): token.address_array {
+    return this._excludedFromRewardsArray.get()!;
+  }
+
+  /**
    * Get the owner of the contract
+   * @external
+   * @readonly
+   * @returns {token.address} - owner of the contract
    */
   get_owner(
     args: token.get_owner_arguments = new token.get_owner_arguments()
@@ -507,49 +519,70 @@ export class Token {
   }
 
   /**
-   * Set the fee collection state of an account - included or excluded from fees collection
+   * Exclude an account from fees collection
    * @external
    * @param args.address - account to set the fee collection state
-   * @param args.exclude - true if the account is excluded from the fees collection
    */
-  set_excluded_fee_collection_state(
-    args: token.set_excluded_fee_collection_state_arguments
+  exclude_fee_collection_state(
+    args: token.exclude_fee_collection_state_arguments
   ): token.empty_message {
     this._check_ownership();
 
-    this._excludedFromFees.put(
-      args.address!,
-      new token.uint64(args.exclude ? 1 : 0)
-    );
+    this._excludedFromFees.put(args.address!, new token.uint64(1));
     return new token.empty_message();
   }
 
   /**
-   * Set the reward / reflections collection state of an account - included or excluded from rewards collection
+   * Exclude an account from rewards collection
    * @external
    * @param args.address - account to set the reward / reflections collection state
-   * @param args.exclude - true if the account is excluded from the rewards collection
    */
-  set_excluded_reward_collection_state(
-    args: token.set_excluded_reward_collection_state_arguments
+  exclude_reward_collection_state(
+    args: token.exclude_reward_collection_state_arguments
   ): token.empty_message {
     this._check_ownership();
 
-    this._excludedFromRewards.put(
-      args.address!,
-      new token.uint64(args.exclude ? 1 : 0)
+    const address = args.address!;
+
+    // Check if the account is already excluded from rewards
+    System.require(
+      !this.get_excluded_reward_collection_state(
+        new token.get_excluded_reward_collection_state_arguments(address)
+      ).value,
+      "account is already excluded from rewards"
     );
 
+    const reflectedBalanceValue: u128 = u128.fromString(
+      this._reflectedBalances.get(address)!.value!
+    );
+
+    if (reflectedBalanceValue > u128.Zero) {
+      // @ts-ignore
+      const currentRate: u128 = this._get_rate(
+        u128.fromString(this._reflectedTotal.get()!.value!)
+      );
+      // @ts-ignore
+      const res: u128 = reflectedBalanceValue / currentRate;
+      this._balances.put(address, new token.uint64(res.toU64()));
+    }
+
+    this._excludedFromRewards.put(address, new token.uint64(1));
+
     const excludedFromRewardsArray = this._excludedFromRewardsArray.get()!;
-    if (args.exclude) {
-      excludedFromRewardsArray.addresses.push(args.address!);
-    } else {
-      const index = excludedFromRewardsArray.addresses.indexOf(args.address!);
-      if (index > -1) {
-        excludedFromRewardsArray.addresses.splice(index, 1);
+    let foundIndex = -1;
+    for (let i = 0; i < excludedFromRewardsArray.addresses.length; i++) {
+      if (Arrays.equal(excludedFromRewardsArray.addresses[i], address)) {
+        foundIndex = i;
+        break;
       }
     }
+
+    if (foundIndex < 0) {
+      excludedFromRewardsArray.addresses.push(address);
+    }
+
     this._excludedFromRewardsArray.put(excludedFromRewardsArray);
+
     return new token.empty_message();
   }
 
@@ -626,11 +659,12 @@ export class Token {
     // Get and compute all the required values for the transfer
     const rTotal: token.str = this._reflectedTotal.get()!;
     const rTotalValue: u128 = u128.fromString(rTotal.value!);
-    const tokenValues = this._get_token_values(args.value);
+    const tAmount = args.value;
+    const tokenValues = this._get_token_values(tAmount);
     const tTransferAmount = tokenValues[0];
     const tFee = tokenValues[1];
     const reflectionValues = this._get_reflection_values(
-      args.value,
+      tAmount,
       tFee,
       rTotalValue
     );
@@ -657,7 +691,7 @@ export class Token {
     this._reflectedBalances.put(args.from!, fromReflectedBalance);
     if (isSenderExcludedFromRewards) {
       let fromBalance = this._balances.get(args.from!)!;
-      fromBalance.value = SafeMath.sub(fromBalance.value, args.value);
+      fromBalance.value = SafeMath.sub(fromBalance.value, tAmount);
       this._balances.put(args.from!, fromBalance);
     }
 
@@ -702,7 +736,7 @@ export class Token {
       System.event(
         "token.burn_event",
         Protobuf.encode<token.burn_event>(
-          new token.burn_event(args.from, args.to, args.value),
+          new token.burn_event(args.from, args.to, tTransferAmount),
           token.burn_event.encode
         ),
         impacted
@@ -711,7 +745,7 @@ export class Token {
       System.event(
         "token.transfer_event",
         Protobuf.encode<token.transfer_event>(
-          new token.transfer_event(args.from, args.to, args.value),
+          new token.transfer_event(args.from, args.to, tTransferAmount),
           token.transfer_event.encode
         ),
         impacted
@@ -733,18 +767,27 @@ export class Token {
    */
   _get_rate(rSupply: u128): u128 {
     let tSupply: u64 = this._supply.get()!.value;
+    // @ts-ignore
+    const defaultRate: u128 = rSupply / u128.fromU64(tSupply);
+
     const excludedFromRewardsArray =
       this._excludedFromRewardsArray.get()!.addresses;
-
     for (let i: i32 = 0; i < excludedFromRewardsArray.length; i++) {
       const reflectedBalance: u128 = u128.fromString(
         this._reflectedBalances.get(excludedFromRewardsArray[i])!.value!
       );
       const balance = this._balances.get(excludedFromRewardsArray[i])!.value;
 
+      if (reflectedBalance > rSupply || balance > tSupply) {
+        return defaultRate;
+      }
+
       // @ts-ignore
       rSupply = rSupply - reflectedBalance;
       tSupply = SafeMath.sub(tSupply, balance);
+    }
+    if (rSupply < defaultRate) {
+      return defaultRate;
     }
 
     // @ts-ignore
@@ -819,6 +862,9 @@ export class Token {
    * @internal
    */
   _check_ownership(): void {
-    System2.check_authority(this._owner.get()!.value!);
+    System.require(
+      System2.check_authority(this._owner.get()!.value!),
+      "owner did not authorized this operation"
+    );
   }
 }

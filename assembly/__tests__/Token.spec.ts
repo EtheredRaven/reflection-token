@@ -14,10 +14,11 @@ const CONTRACT_ID = Base58.decode("1DQzuCcTKacbs9GGScRTU1Hc8BsyARTPqe");
 const MOCK_ACCT1 = Base58.decode("1DQzuCcTKacbs9GGScRTU1Hc8BsyARTPqG");
 const MOCK_ACCT2 = Base58.decode("1DQzuCcTKacbs9GGScRTU1Hc8BsyARTPqK");
 const MOCK_ACCT3 = Base58.decode("1DQzuCcTKacbs9GGScRTU1cc8BsyARTPqK");
+const MOCK_ACCT4 = Base58.decode("1DQzuCcTKacbs9GGScRTU1Hc8BsyARTPqL");
 const BLANK_ACCT = new Uint8Array(0);
 const BURN_ADDRESS = Base58.decode("1CounterpartyXXXXXXXXXXXXXXXUWLpVr");
 
-const tokenSupply: u64 = 10000000000000000; // 100 000 000 with 8 decimals
+const tokenSupply: u64 = 25200000000000000; // 252 000 000 with 8 decimals
 const reflectionRate = 500; // 5%
 
 function isIntegerCloseTo(a: u64, b: u64, tolerance: u64): void {
@@ -54,7 +55,9 @@ describe("default token", () => {
 
   it("should set the info and get it", () => {
     const tkn = new Token();
-    tkn.set_info(new token.set_info_arguments("Token", "TKN"));
+    tkn.init_token(
+      new token.init_token_arguments("Token", "TKN", 0, MOCK_ACCT1, 1000)
+    );
 
     expect(tkn.name().value).toBe("Token");
     expect(tkn.get_info().name).toBe("Token");
@@ -68,8 +71,12 @@ describe("default token", () => {
   it("should not be able to change the info", () => {
     expect(() => {
       const tkn = new Token();
-      tkn.set_info(new token.set_info_arguments("Token", "TKN"));
-      tkn.set_info(new token.set_info_arguments("Token", "TKN"));
+      tkn.init_token(
+        new token.init_token_arguments("Token", "TKN", 0, MOCK_ACCT1, 1000)
+      );
+      tkn.init_token(
+        new token.init_token_arguments("Token", "TKN", 0, MOCK_ACCT1, 1000)
+      );
     }).toThrow();
 
     expect(MockVM.getErrorMessage()).toStrictEqual(
@@ -79,11 +86,10 @@ describe("default token", () => {
 
   it("should mint tokens and get the right balance and total supply", () => {
     const tkn = new Token();
-    tkn.set_info(new token.set_info_arguments("Token", "TKN"));
-
     const tokenSupply = 1000;
-
-    tkn.mint(new token.mint_arguments(MOCK_ACCT1, tokenSupply));
+    tkn.init_token(
+      new token.init_token_arguments("Token", "TKN", 0, MOCK_ACCT1, tokenSupply)
+    );
 
     expect(
       tkn.balance_of(new token.balance_of_arguments(MOCK_ACCT1)).value
@@ -94,25 +100,12 @@ describe("default token", () => {
     expect(tkn.total_supply().value).toBe(1000);
   });
 
-  it("should not be able to mint tokens twice", () => {
-    expect(() => {
-      const tkn = new Token();
-      tkn.set_info(new token.set_info_arguments("Token", "TKN"));
-      tkn.mint(new token.mint_arguments(MOCK_ACCT1, 1000));
-      tkn.mint(new token.mint_arguments(MOCK_ACCT1, 1000));
-    }).toThrow();
-
-    expect(MockVM.getErrorMessage()).toStrictEqual(
-      "the token supply is already minted"
-    );
-  });
-
   it("should transfer tokens and get the right balance", () => {
     const tkn = new Token();
-    tkn.set_info(new token.set_info_arguments("Token", "TKN"));
-
     setAuthority(MOCK_ACCT1);
-    tkn.mint(new token.mint_arguments(MOCK_ACCT1, 1000));
+    tkn.init_token(
+      new token.init_token_arguments("Token", "TKN", 0, MOCK_ACCT1, 1000)
+    );
 
     tkn.transfer(new token.transfer_arguments(MOCK_ACCT1, MOCK_ACCT2, 100));
 
@@ -127,8 +120,9 @@ describe("default token", () => {
   it("should not be able to transfer more tokens than the balance", () => {
     expect(() => {
       const tkn = new Token();
-      tkn.set_info(new token.set_info_arguments("Token", "TKN"));
-      tkn.mint(new token.mint_arguments(MOCK_ACCT1, 1000));
+      tkn.init_token(
+        new token.init_token_arguments("Token", "TKN", 0, MOCK_ACCT1, 1000)
+      );
 
       tkn.transfer(new token.transfer_arguments(MOCK_ACCT1, MOCK_ACCT2, 999));
       tkn.transfer(new token.transfer_arguments(MOCK_ACCT1, MOCK_ACCT2, 2));
@@ -142,8 +136,9 @@ describe("default token", () => {
   it("should not be able to transfer tokens if not authorized", () => {
     expect(() => {
       const tkn = new Token();
-      tkn.set_info(new token.set_info_arguments("Token", "TKN"));
-      tkn.mint(new token.mint_arguments(MOCK_ACCT1, 1000));
+      tkn.init_token(
+        new token.init_token_arguments("Token", "TKN", 0, MOCK_ACCT1, 1000)
+      );
 
       MockVM.setCaller(
         new chain.caller_data(MOCK_ACCT2, chain.privilege.user_mode)
@@ -158,8 +153,9 @@ describe("default token", () => {
 
   it("should approve tokens and get the right allowance", () => {
     const tkn = new Token();
-    tkn.set_info(new token.set_info_arguments("Token", "TKN"));
-    tkn.mint(new token.mint_arguments(MOCK_ACCT1, 1000));
+    tkn.init_token(
+      new token.init_token_arguments("Token", "TKN", 0, MOCK_ACCT1, 1000)
+    );
 
     tkn.approve(new token.approve_arguments(MOCK_ACCT1, MOCK_ACCT2, 100));
 
@@ -185,8 +181,9 @@ describe("default token", () => {
   it("should not be able to approve tokens if not authorized", () => {
     expect(() => {
       const tkn = new Token();
-      tkn.set_info(new token.set_info_arguments("Token", "TKN"));
-      tkn.mint(new token.mint_arguments(MOCK_ACCT1, 1000));
+      tkn.init_token(
+        new token.init_token_arguments("Token", "TKN", 0, MOCK_ACCT1, 1000)
+      );
 
       MockVM.setCaller(
         new chain.caller_data(MOCK_ACCT2, chain.privilege.user_mode)
@@ -202,8 +199,9 @@ describe("default token", () => {
   it("should not be able to transfer more tokens than the allowance", () => {
     expect(() => {
       const tkn = new Token();
-      tkn.set_info(new token.set_info_arguments("Token", "TKN"));
-      tkn.mint(new token.mint_arguments(MOCK_ACCT1, 1000));
+      tkn.init_token(
+        new token.init_token_arguments("Token", "TKN", 0, MOCK_ACCT1, 1000)
+      );
 
       tkn.approve(new token.approve_arguments(MOCK_ACCT1, MOCK_ACCT2, 100));
 
@@ -220,8 +218,9 @@ describe("default token", () => {
 
   it("should get allowances", () => {
     const tkn = new Token();
-    tkn.set_info(new token.set_info_arguments("Token", "TKN"));
-    tkn.mint(new token.mint_arguments(MOCK_ACCT1, 1000));
+    tkn.init_token(
+      new token.init_token_arguments("Token", "TKN", 0, MOCK_ACCT1, 1000)
+    );
 
     tkn.approve(new token.approve_arguments(MOCK_ACCT1, MOCK_ACCT2, 100));
     tkn.approve(new token.approve_arguments(MOCK_ACCT1, MOCK_ACCT3, 200));
@@ -258,8 +257,9 @@ describe("default token", () => {
 
   it("should burn tokens and get the right balance and total supply", () => {
     const tkn = new Token();
-    tkn.set_info(new token.set_info_arguments("Token", "TKN"));
-    tkn.mint(new token.mint_arguments(MOCK_ACCT1, 1000));
+    tkn.init_token(
+      new token.init_token_arguments("Token", "TKN", 0, MOCK_ACCT1, 1000)
+    );
 
     tkn.transfer(new token.transfer_arguments(MOCK_ACCT1, BURN_ADDRESS, 100));
 
@@ -282,15 +282,30 @@ describe("token with fee", () => {
 
   it("should get the right fee", () => {
     const tkn = new Token();
-    tkn.set_info(new token.set_info_arguments("Token", "TKN", 500)); // 5%
+    tkn.init_token(
+      new token.init_token_arguments(
+        "Token",
+        "TKN",
+        500,
+        MOCK_ACCT1,
+        tokenSupply
+      )
+    ); // 5%
 
     expect(tkn.get_info().fee).toBe(500);
   });
 
   it("should mint tokens and get the right balance and total supply", () => {
     const tkn = new Token();
-    tkn.set_info(new token.set_info_arguments("Token", "TKN", reflectionRate)); // 5%
-    tkn.mint(new token.mint_arguments(MOCK_ACCT1, tokenSupply));
+    tkn.init_token(
+      new token.init_token_arguments(
+        "Token",
+        "TKN",
+        reflectionRate,
+        MOCK_ACCT1,
+        tokenSupply
+      )
+    ); // 5%
 
     expect(
       tkn.balance_of(new token.balance_of_arguments(MOCK_ACCT1)).value
@@ -322,13 +337,22 @@ describe("token with fee", () => {
 
   it("should transfer tokens and get the right balance and rate", () => {
     const tkn = new Token();
-    tkn.set_info(new token.set_info_arguments("Token", "TKN", reflectionRate)); // 5%
     const u128TokenSupply: u128 = u128.fromU64(tokenSupply);
 
     // @ts-ignore
     const rate: u128 = // @ts-ignore
       (u128.Max - (u128.Max % u128TokenSupply)) / u128TokenSupply;
-    tkn.mint(new token.mint_arguments(MOCK_ACCT1, tokenSupply));
+
+    tkn.init_token(
+      new token.init_token_arguments(
+        "Token",
+        "TKN",
+        reflectionRate,
+        MOCK_ACCT1,
+        tokenSupply
+      )
+    ); // 5%
+
     let rTotal: u128 = u128.fromString(tkn._reflectedTotal.get()!.value!);
 
     expect(tkn._get_rate(rTotal)).toBe(rate);
@@ -524,5 +548,80 @@ describe("token with fee", () => {
     expect(
       tkn.balance_of(new token.balance_of_arguments(MOCK_ACCT3)).value
     ).toBe(newMockAcct3Balance + reflectedRewardMockAcct3.toU64());
+  });
+
+  it("should transfer and get the right rewards for excluded rewards addresses and burn addresses", () => {
+    const tkn = new Token();
+    const u128TokenSupply: u128 = u128.fromU64(tokenSupply);
+    tkn.init_token(
+      new token.init_token_arguments(
+        "Token",
+        "TKN",
+        reflectionRate,
+        MOCK_ACCT1,
+        tokenSupply
+      )
+    ); // 5%
+
+    // Exclude MOCK_ACCT2 from rewards
+    tkn.exclude_reward_collection_state(
+      new token.exclude_reward_collection_state_arguments(MOCK_ACCT2)
+    );
+
+    const amountBurned = tokenSupply / 2;
+    tkn.burn(new token.burn_arguments(MOCK_ACCT1, amountBurned));
+    let total_supply = tkn.total_supply().value;
+    expect(total_supply).toBe(tokenSupply - amountBurned);
+    expect(
+      tkn.balance_of(new token.balance_of_arguments(BURN_ADDRESS)).value
+    ).toBe(amountBurned);
+
+    // No fees because MOCK_ACCT1 is the owner so excluded from fees
+    const amountFrom1To2 = tokenSupply / 10; // 1 with 8 decimals
+    tkn.transfer(
+      new token.transfer_arguments(MOCK_ACCT1, MOCK_ACCT2, amountFrom1To2)
+    );
+    expect(
+      tkn.balance_of(new token.balance_of_arguments(MOCK_ACCT1)).value
+    ).toBe(tokenSupply - amountBurned - amountFrom1To2);
+    expect(
+      tkn.balance_of(new token.balance_of_arguments(MOCK_ACCT2)).value
+    ).toBe(amountFrom1To2);
+
+    // No fees because MOCK_ACCT1 is the owner so excluded from fees
+    const amountFrom1to3 = tokenSupply / 10; // 1 with 8 decimals
+    tkn.transfer(
+      new token.transfer_arguments(MOCK_ACCT1, MOCK_ACCT3, amountFrom1to3)
+    );
+    expect(
+      tkn.balance_of(new token.balance_of_arguments(MOCK_ACCT1)).value
+    ).toBe(tokenSupply - amountBurned - amountFrom1To2 - amountFrom1to3);
+    expect(
+      tkn.balance_of(new token.balance_of_arguments(MOCK_ACCT3)).value
+    ).toBe(amountFrom1to3);
+
+    MockVM.setCaller(
+      new chain.caller_data(MOCK_ACCT3, chain.privilege.user_mode)
+    );
+    // Transaction with a fee
+    const amountFrom3to4 = tokenSupply / 20; // 1 with 8 decimals
+    tkn.transfer(
+      new token.transfer_arguments(MOCK_ACCT3, MOCK_ACCT4, amountFrom3to4)
+    );
+
+    // Check that the rewards are well distributed among the non-excluded addresses (burn address, MOCK_ACCT3 and MOCK_ACCT4)
+    /* const expectedSupplyToCalculateRewards = amountBurned + amountFrom1to3;
+    const rewardsToDistribute = (amountFrom3to4 * reflectionRate) / 10000;
+    // @ts-ignore
+    const expectedRewardsForBurnAddress: u128 =
+      // @ts-ignore
+      (u128.fromU64(amountBurned) * u128.fromU64(rewardsToDistribute)) /
+      // @ts-ignore
+      u128.fromU64(expectedSupplyToCalculateRewards);
+    expect(
+      tkn.balance_of(new token.balance_of_arguments(BURN_ADDRESS)).value
+    ).toBe(amountBurned + expectedRewardsForBurnAddress.toU64());*/
+
+    // Check the total supply (some were burned due to the burn address getting rewards)
   });
 });
